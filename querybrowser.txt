@@ -1,0 +1,2 @@
+- filter/zoeken per kolom
+- column select
