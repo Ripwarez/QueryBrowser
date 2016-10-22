@@ -4,6 +4,7 @@
     "homepage": "http://github.com/Ripwarez/QueryBrowser",
     "type": "library",
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Paul Hekkema",
