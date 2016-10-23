@@ -1,6 +1,7 @@
 {
-    "name": "ripwarez/querybrowser",
+    "name": "querybrowser/querybrowser",
     "description": "QueryBrowser",
+    "keywords": ["query", "browser"],
     "homepage": "http://github.com/Ripwarez/QueryBrowser",
     "type": "library",
     "license": "MIT",
@@ -19,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-        	"Ripwarez\\QueryBrowser\\": "src"
+        	"QueryBrowser\\": "src"
         }
     }
 }

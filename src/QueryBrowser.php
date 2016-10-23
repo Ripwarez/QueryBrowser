@@ -1,6 +1,6 @@
 <?php
 
-namespace Ripwarez\QueryBrowser;
+namespace QueryBrowser;
 
 class QueryBrowser
 {

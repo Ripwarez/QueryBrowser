@@ -1,6 +1,6 @@
 <?php
  
-use Ripwarez\QueryBrowser\QueryBrowser;
+use QueryBrowser\QueryBrowser;
  
 class QueryBrowserTest extends PHPUnit_Framework_TestCase
 {
