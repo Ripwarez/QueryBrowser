@@ -1,12 +1,12 @@
 <?php
  
-use QueryBrowser\QueryBrowser;
+use QueryBrowser\QueryBrowserFactory;
  
 class QueryBrowserTest extends PHPUnit_Framework_TestCase
 {
-    public function testNachHasCheese()
+    public function testQueryBrowserFactory()
     {
-        $qb = new QueryBrowser;
+        QueryBrowserFactory::create([]);
         //$this->assertTrue($nacho->hasCheese());
     }
 }
