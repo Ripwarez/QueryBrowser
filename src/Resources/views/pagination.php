@@ -1,13 +1,13 @@
 Showing <?php echo $firstResult; ?> to <?php echo $lastResult; ?> of <?php echo $totalResults; ?> results
 
 <?php if (count($pageSizeOptions) > 0): ?>
-Show
-<select name="pagesize" onchange="QBR.setPageSize('<?php echo $id; ?>', this.value);">
-	<?php foreach ($pageSizeOptions as $i): ?>
-		<option value="<?php echo $i; ?>" <?php if ($pageSize == $i) echo 'selected'; ?>><?php echo $i; ?></option>
-	<?php endforeach; ?>
-</select>
-entries
+	Show
+	<select name="pagesize" onchange="QBR.setPageSize('<?php echo $id; ?>', this.value);">
+		<?php foreach ($pageSizeOptions as $i): ?>
+			<option value="<?php echo $i; ?>" <?php if ($pageSize == $i) echo 'selected'; ?>><?php echo $i; ?></option>
+		<?php endforeach; ?>
+	</select>
+	entries
 <?php endif; ?>
 
 <ul class="pagination">

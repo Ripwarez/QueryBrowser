@@ -11,16 +11,15 @@
 
 namespace QueryBrowser;
 
-use QueryBrowser\Exception\ViewNotFoundException;
+use QueryBrowser\State;
 use QueryBrowser\Result\Column;
+use QueryBrowser\Exception\ViewNotFoundException;
 
 /**
  * class Result
  */
-class Result
+class Result extends State
 {
-    protected $qb;
-
     protected $columns;
 
     protected $results;
@@ -33,9 +32,8 @@ class Result
      * @param
      * @return  void
      */
-    public function __construct(&$qb, &$results, $totalResults)
+    public function __construct(&$results, $totalResults)
     {
-        $this->qb = $qb;
         $this->results = $results;
         $this->totalResults = $totalResults;
         
@@ -45,8 +43,8 @@ class Result
             foreach (array_keys($result) as $i => $name) {
                 $column = new Column($name, $i);
 
-                if ($name == $qb->getOrderBy()) {
-                    $column->setOrderDirection($qb->getOrderDirection());
+                if ($name == $this->orderBy) {
+                    $column->setOrderDirection($this->orderDirection);
                 }
 
                 $this->columns[$name] = $column;
@@ -79,37 +77,51 @@ class Result
             $config
         );
 
-        $totalPages = ceil($this->totalResults / $this->qb->getPageSize());
-        $currentPage = $this->qb->getPage();
+        $totalPages = ceil($this->totalResults / $this->pageSize);
         $nrResults = count($this->results);
-        $offset = $this->qb->getOffset();
+        $offset = $this->getOffset();
 
         $data = [
             'qbr'             => $this,
-            'id'              => $this->qb->getId(),
+            'id'              => $this->id,
             'results'         => $this->results,
             'columns'         => $this->columns,
-            'orderBy'         => $this->qb->getOrderBy(),
-            'orderDirection'  => $this->qb->getOrderDirection(),
-            'globalSearch'    => $this->qb->getGlobalSearch(),
+            'orderBy'         => $this->orderBy,
+            'orderDirection'  => $this->orderDirection,
+            'globalSearch'    => $this->globalSearch,
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
             'nrResults'       => $nrResults,
             'totalResults'    => $this->totalResults,
             'totalPages'      => $totalPages,
-            'currentPage'     => $currentPage,
-            'previousPage'    => ($currentPage > 1) ? $currentPage - 1 : 0,
-            'nextPage'        => ($currentPage < $totalPages) ? $currentPage + 1 : 0,
-            'firstPage'       => ($currentPage != 1) ? 1: 0,
-            'lastPage'        => ($currentPage < $totalPages) ? $totalPages : 0,
-            'pageSize'        => $this->qb->getPageSize(),
+            'currentPage'     => $this->page,
+            'previousPage'    => ($this->page > 1) ? $this->page - 1 : 0,
+            'nextPage'        => ($this->page < $totalPages) ? $this->page + 1 : 0,
+            'firstPage'       => ($this->page != 1) ? 1: 0,
+            'lastPage'        => ($this->page < $totalPages) ? $totalPages : 0,
+            'pageSize'        => $this->pageSize,
             'pageSizeOptions' => [10, 25, 50, 100],
             'createURI'       => $config['createURI'],
             'updateURI'       => $config['updateURI'],
-            'deleteURI'       => $config['deleteURI']
+            'deleteURI'       => $config['deleteURI'],
         ];
 
-        return $this->fetch_html($data, $view);
+        return $this->render_view($data, $view);
+    }
+
+    /**
+     * sets only variables that the view may have
+     */
+    protected function render_view($data, $file)
+    {
+        // create the variables
+        extract($data);
+
+        ob_start();
+        include($file);
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
     }
 
     /**
@@ -137,20 +149,5 @@ class Result
         }
 
         return $uri;
-    }
-
-    /**
-     * sets only variables that the view may have
-     */
-    protected function fetch_html($data, $file)
-    {
-        // create the variables
-        extract($data);
-
-        ob_start();
-        include($file);
-        $html = ob_get_contents();
-        ob_end_clean();
-        return $html;
     }
 }

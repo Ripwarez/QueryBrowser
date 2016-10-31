@@ -18,7 +18,7 @@ interface DriverInterface
 {
     public function getId();
     
-    public function getResults($offset, $limit, $globalSearch, $orderBy, $orderDirection);
+    public function getResults();
 
     public function getTotalResults();
 }

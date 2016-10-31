@@ -11,82 +11,68 @@
 
 namespace QueryBrowser\Driver;
 
+use QueryBrowser\State;
+
 /**
  * .
  */
-class ArrayDriver implements DriverInterface
+class ArrayDriver extends State implements DriverInterface
 {
-    /**
-     * [$id description]
-     * @var [type]
-     */
-    protected $id;
-
     /**
      * [$array description]
      * @var [type]
      */
-    protected $array;
+    protected $data;
 
     /*
      * @var  string  order column that can be accessed from the static sortResults function
      */
-    protected static $orderBy;
+    protected static $_orderBy;
 
     /*
      * @var  string  order direction that can be accessed from the static sortResults function
      */
-    protected static $orderDirection;
+    protected static $_orderDirection;
 
     /**
      * [__construct description]
      * @param [type] $array [description]
      * @param [type] $id    [description]
      */
-    public function __construct($array, $id = null)
+    public function __construct($data, $id = null)
     {
-        $this->array = $array;
-        $this->id = 'array';
-    }
-
-    /**
-     * Get the id.
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
+        $this->data = $data;
+        $this->id = md5(implode('-', array_keys($data)));
     }
 
     /**
      * @return void
      */
-    public function getResults($offset, $limit, $globalSearch, $orderBy, $orderDirection)
+    public function getResults()
     {
-        if (!empty($globalSearch)) {
-            $this->applyGlobalSearch($globalSearch);
+        if (!empty($this->globalSearch)) {
+            $this->applyGlobalSearch($this->globalSearch);
         }
 
         // sort
-        if (!empty($orderBy) && !empty($orderDirection)) {
-            self::$orderBy= $orderBy;
-            self::$orderDirection= $orderDirection;
-            usort($this->array, 'self::sortResults');
+        if (!empty($this->orderBy) && !empty($this->orderDirection)) {
+            self::$_orderBy = $this->orderBy;
+            self::$_orderDirection = $this->orderDirection;
+            usort($this->data, 'self::sortResults');
         }
     
-        if ($offset > 0 || $limit > 0) {
-            return array_slice($this->array, $offset, $limit);
+        $offset = $this->getOffset();
+        if ($offset > 0 || $this->pageSize > 0) {
+            return array_slice($this->data, $offset, $this->pageSize);
         }
 
-        return $this->array;
+        return $this->data;
     }
 
     public function getTotalResults()
     {
-        return count($this->array);
+        return count($this->data);
     }
-
 
     /**
      * [applySearch description]
@@ -94,7 +80,7 @@ class ArrayDriver implements DriverInterface
      */
     protected function applyGlobalSearch($searchString)
     {
-        foreach ($this->array as $k => $row) {
+        foreach ($this->data as $k => $row) {
             $found = false;
             foreach ($row as $field) {
                 if (is_array($field) || is_object($field)) {
@@ -108,7 +94,7 @@ class ArrayDriver implements DriverInterface
             }
 
             if (!$found) {
-                unset($this->array[$k]);
+                unset($this->data[$k]);
             }
         }
     }
@@ -119,10 +105,10 @@ class ArrayDriver implements DriverInterface
      */
     protected static function sortResults($a, $b)
     {
-        $a = strtolower($a[self::$orderBy]);
-        $b = strtolower($b[self::$orderBy]);
+        $a = strtolower($a[self::$_orderBy]);
+        $b = strtolower($b[self::$_orderBy]);
 
-        if (self::$orderDirection == 'asc') {
+        if (self::$_orderDirection == 'asc') {
             return ($a < $b) ? -1 : 1;
         } else {
             return ($a > $b) ? -1 : 1;
