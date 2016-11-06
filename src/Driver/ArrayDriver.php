@@ -46,6 +46,16 @@ class ArrayDriver extends State implements DriverInterface
     }
 
     /**
+     * Gets the id.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * @return void
      */
     public function getResults()

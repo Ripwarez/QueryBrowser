@@ -14,9 +14,10 @@
 	id="<?php echo $id; ?>"
 	data-id="<?php echo $id; ?>"
 	data-page="<?php echo $currentPage; ?>"
-	data-page-size="<?php echo $pageSize; ?>"
-	data-order-by="<?php echo $orderBy; ?>"
-	data-order-direction="<?php echo $orderDirection; ?>"
+	data-pagesize="<?php echo $pageSize; ?>"
+	data-orderby="<?php echo $orderBy; ?>"
+	data-orderdirection="<?php echo $orderDirection; ?>"
+	data-globalsearch="<?php echo $globalSearch; ?>"
 	data-form-action=""
 	data-form-method="POST"
 	data-use-ajax="0">
@@ -36,7 +37,7 @@
 					<th class="update"></th>
 				<?php endif; ?>
 
-				<?php foreach($columns as $column): ?>
+				<?php foreach ($columns as $column): ?>
 					<?php if ($column->isVisible()): ?>
 						<th>
 							<?php if ($column->isOrderable()): ?>
@@ -64,24 +65,36 @@
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach($results as $result): ?>
+			<?php foreach ($results as $result): ?>
 				<tr>
 					<?php if (!empty($deleteURI)): ?>
 						<td class="update">
-							<a href="<?php echo $qbr->rewriteURIPlaceholders($updateURI, $result); ?>"><span class="glyphicon glyphicon-pencil"></span></a>
+							<a href="<?php echo $this->rewriteURIPlaceholders($updateURI, $result); ?>"><span class="glyphicon glyphicon-pencil"></span></a>
 						</td>
 					<?php endif; ?>
 
-					<?php foreach($result as $columnId => $value): ?>
-						<?php $column = $this->columns[$columnId]; ?>
+					<?php foreach ($columns as $column): ?>
 						<?php if ($column->isVisible()): ?>
-							<td><?php echo $value; ?></td>
+							<td>
+								<?php $value = $result[$column->getId()]; ?>
+								<?php if (is_array($value) || is_object($value)): ?>
+									<?php $value = print_r($value, true); ?>
+								<?php endif; ?>
+
+								<?php if (isset($firstColumn) && $column == $firstColumn): ?>
+									{{ HTML::link($this->rewriteURIPlaceholders($updateURI, $row), $value) }}
+								<?php elseif (!empty($globalSearch)): ?>
+									<?php echo $this->highlightString($globalSearch, $value); ?>
+								<?php else: ?>
+									<?php echo $value; ?>
+								<?php endif; ?>
+							</td>
 						<?php endif ?>
 					<?php endforeach; ?>
 
 					<?php if (!empty($deleteURI)): ?>
 						<td class="delete">
-							<a href="{<?php echo $qbr->rewriteURIPlaceholders($deleteURI, $result); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+							<a href="<?php echo $this->rewriteURIPlaceholders($deleteURI, $result); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 						</td>
 					<?php endif; ?>
 				</tr>
@@ -89,7 +102,7 @@
 		</tbody>
 	</table>
 
-	<?php if ( $totalPages > 1): ?>
+	<?php if ($totalPages > 1): ?>
 		<?php include('pagination.php'); ?>
 	<?php endif ;?>
 </div>

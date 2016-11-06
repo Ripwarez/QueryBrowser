@@ -12,6 +12,7 @@
 namespace QueryBrowser;
 
 use QueryBrowser\State;
+use QueryBrowser\View;
 use QueryBrowser\Result\Column;
 use QueryBrowser\Exception\ViewNotFoundException;
 
@@ -58,14 +59,14 @@ class Result extends State
      * @param   array
      * @return  string  output (HTML)
      */
-    public function render($config = [], $view = '')
+    public function render($config = [], $file = '')
     {
-        if ($view == '') {
-            $view = dirname(__FILE__) . '/Resources/views/qbr.php';
+        if ($file == '') {
+            $file = dirname(__FILE__) . '/Resources/views/qbr.php';
         }
 
-        if (!file_exists($view)) {
-            throw new ViewNotFoundException(sprintf('Unable to find file %s.', $view));
+        if (!file_exists($file)) {
+            throw new ViewNotFoundException(sprintf('Unable to find file %s.', $file));
         }
 
         $config = array_merge([
@@ -82,7 +83,6 @@ class Result extends State
         $offset = $this->getOffset();
 
         $data = [
-            'qbr'             => $this,
             'id'              => $this->id,
             'results'         => $this->results,
             'columns'         => $this->columns,
@@ -103,51 +103,86 @@ class Result extends State
             'pageSizeOptions' => [10, 25, 50, 100],
             'createURI'       => $config['createURI'],
             'updateURI'       => $config['updateURI'],
-            'deleteURI'       => $config['deleteURI'],
+            'deleteURI'       => $config['deleteURI']
         ];
 
-        return $this->render_view($data, $view);
+        $view = new View($file, $data);
+        return $view->render();
     }
 
     /**
-     * sets only variables that the view may have
-     */
-    protected function render_view($data, $file)
-    {
-        // create the variables
-        extract($data);
-
-        ob_start();
-        include($file);
-        $html = ob_get_contents();
-        ob_end_clean();
-        return $html;
-    }
-
-    /**
-     * Replace placeholders within the uri using data from the current result.
+     * Call an user-defined function on a column.
      *
-     * @param  string  $uri
-     * @param  array   $result
-     * @return string
+     * The first parameter of the user function will contain the value of the record.
+     * Extra parameters needed for the user function can be added to this function parameters.
+     *
+     * @param   string  $columnId      column
+     * @param   string  $function         callback function
+     * @param   bool    $resultParameter  use $row as second parameter in callback function
+     * @return  void
      */
-    public function rewriteUriPlaceholders($uri, &$result)
+    public function callFunctionOnColumn($columnId, $function, $resultParameter = false)
     {
-        // find placeholders
-        preg_match_all('#<([a-zA-Z0-9_]++)>#', $uri, $matches);
-
-        if (isset($matches[1])) {
-            foreach ($matches[1] as $i => $columnKey) {
-                // <key>
-                $key = $matches[0][$i];
-
-                // get the column value
-                if (isset($this->columns[$columnKey]) && isset($result[$columnKey])) {
-                    $uri = str_replace($key, $result[$columnKey], $uri);
+        if (isset($this->columns[$columnId])) {
+            $userArgs = array_slice(func_get_args(), 2);
+            foreach ($this->results as $i => $row) {
+                if ($resultParameter) {
+                    $callbackParams = array_merge(array($this->results[$i][$columnId]), array($row), $userArgs);
+                } else {
+                    $callbackParams = array_merge(array($this->results[$i][$columnId]), $userArgs);
                 }
+                $this->results[$i][$columnId] = call_user_func_array($function, $callbackParams);
             }
         }
+    }
 
-        return $uri;
+    /**
+     * Adds a (static) column.
+     *
+     * @param   string  $f       column
+     * @param   int     $offset  offset, 0 is first, -1 is last
+     * @param   string  $dv      default value
+     * @return  void
+     */
+    public function addColumn($columnId, $value = null, $offset = -1)
+    {
+        if (isset($this->columns[$columnId])) {
+            return false;
+        } else {
+            $this->addValueToArray($this->columns, $columnId, $columnId, $offset);
+            foreach ($this->results as $k => $v) {
+                $this->addValueToArray($this->results[$k], $columnId, $value, $offset);
+            }
+            $column = new Column($columnId, $columnId);
+            $column->setOrderable(false);
+            $this->columns[$columnId] = $column;
+        }
+    }
+
+    /**
+     * Add a value to an array at specified offset.
+     *
+     * @param  array   $arr
+     * @param  string  $key
+     * @param  string  $value
+     * @param  int     $offset
+     */
+    private function addValueToArray(&$arr, $key, $value, $offset)
+    {
+        switch ($offset) {
+            case 0: // first
+                $arr = array($key => $value) + $arr;
+                break;
+
+            case -1: // last
+                $arr[$key] = $value;
+                break;
+
+            default:
+                $part1 = array_slice($arr, 0, $offset, true);
+                $part2 = array_slice($arr, $offset, count($arr), true);
+                $arr = array_merge($part1, array($key => $value), $part2);
+                break;
+        }
     }
 }

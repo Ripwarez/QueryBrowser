@@ -18,7 +18,6 @@ use QueryBrowser\State;
  */
 class PersistentState extends State
 {
-
     protected function getState()
     {
         return [

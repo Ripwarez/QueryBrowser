@@ -14,6 +14,6 @@ namespace QueryBrowser\Driver;
 /**
  * .
  */
-class Illuminiate_Database_Query_BuilderDriver  implements DriverInterface
+class Illuminiate_Database_Query_BuilderDriver implements DriverInterface
 {
 }

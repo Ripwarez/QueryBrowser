@@ -31,3 +31,8 @@
 	width: 21px;
 	height: 20px;
 }
+
+.qbr span.highlight {
+	background-color: #003399;
+	color: #fff;
+}

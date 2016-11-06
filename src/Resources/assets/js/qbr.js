@@ -10,10 +10,10 @@ $(function(){
 					form = $('<form id="' + div.data('id') + '" action="' + div.data('form-action') + '" method="' + div.data('form-method') + '"></form>');
 					form.append('<input type="hidden" name="qbId" value="' + div.data('id') + '">');
 					form.append('<input type="hidden" name="qbPage" value="' + div.data('page') + '">');
-					form.append('<input type="hidden" name="qbPageSize" value="' + div.data('page-size') + '">');
-					form.append('<input type="hidden" name="qbGlobalSearch" value="">');
-					form.append('<input type="hidden" name="qbOrderBy" value="' + div.data('order-by') + '">');
-					form.append('<input type="hidden" name="qbOrderDirection" value="' + div.data('order-direction') + '">');
+					form.append('<input type="hidden" name="qbPageSize" value="' + div.data('pagesize') + '">');
+					form.append('<input type="hidden" name="qbGlobalSearch" value="' + div.data('globalsearch') + '">');
+					form.append('<input type="hidden" name="qbOrderBy" value="' + div.data('orderby') + '">');
+					form.append('<input type="hidden" name="qbOrderDirection" value="' + div.data('orderdirection') + '">');
 					$('body').append(form);
 				}
 

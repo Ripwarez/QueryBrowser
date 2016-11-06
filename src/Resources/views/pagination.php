@@ -4,7 +4,9 @@ Showing <?php echo $firstResult; ?> to <?php echo $lastResult; ?> of <?php echo 
 	Show
 	<select name="pagesize" onchange="QBR.setPageSize('<?php echo $id; ?>', this.value);">
 		<?php foreach ($pageSizeOptions as $i): ?>
-			<option value="<?php echo $i; ?>" <?php if ($pageSize == $i) echo 'selected'; ?>><?php echo $i; ?></option>
+			<option value="<?php echo $i; ?>" <?php if ($pageSize == $i) {
+    echo 'selected';
+} ?>><?php echo $i; ?></option>
 		<?php endforeach; ?>
 	</select>
 	entries
@@ -30,11 +32,11 @@ Showing <?php echo $firstResult; ?> to <?php echo $lastResult; ?> of <?php echo 
 				<?php if ($i > 1 && $i != $prev+1): ?>
 					<li class="disabled"><a href="javascript:void(0);">...</a></li>
 				<?php endif; ?>
-				<li class="<?php echo ( $i == $currentPage ) ? 'active' : ''; ?>"><a href="javascript:void(0);" onclick="QBR.gotoPage('<?php echo $id; ?>', <?php echo $i; ?>);"><?php echo $i; ?></a></li>
+				<li class="<?php echo ($i == $currentPage) ? 'active' : ''; ?>"><a href="javascript:void(0);" onclick="QBR.gotoPage('<?php echo $id; ?>', <?php echo $i; ?>);"><?php echo $i; ?></a></li>
 				<?php $prev = $i; ?>
 			<?php endif; ?>
 		<?php else: ?>
-			<li class="<?php echo ( $i == $currentPage ) ? 'active' : ''; ?>"><a href="javascript:void(0);" onclick="QBR.gotoPage('<?php echo $id; ?>', <?php echo $i; ?>);"><?php echo $i; ?></a></li>
+			<li class="<?php echo ($i == $currentPage) ? 'active' : ''; ?>"><a href="javascript:void(0);" onclick="QBR.gotoPage('<?php echo $id; ?>', <?php echo $i; ?>);"><?php echo $i; ?></a></li>
 		<?php endif; ?>
 	<?php endfor; ?>
 
