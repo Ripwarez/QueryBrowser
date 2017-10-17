@@ -19,22 +19,24 @@ class Helper
     /**
      * Convert boolean to .
      *
-     * @param  string  $v  value
+     * @param mixed $value
+     *
      * @return string
      */
-    public static function YesNo($v)
+    public static function convertToYesNo($value)
     {
-        return ($v) ? 'Yes' : 'No';
+        return ($value) ? 'Yes' : 'No';
     }
 
     /**
      * .
      *
-     * @param  string  $v  value
+     * @param string $value
+     *
      * @return string
      */
-    public static function Image($v, $row, $path)
+    public static function convertToImage($value)
     {
-        return sprintf('<img class="thumbnail img-responsive" src="%s" alt="%2$s">', URL::image(sprintf('%s/%s', $path, $v), 'w64-h64-c'), $v);
+        return sprintf('<img class="thumbnail img-responsive" src="%s" alt="%s">', $value);
     }
 }

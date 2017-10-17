@@ -1,4 +1,5 @@
 # QueryBrowser
+
 QueryBrowser
 
 currently supported:
@@ -8,6 +9,8 @@ laravel (versions?)
 The view requires:
 jquery
 bootstrap3
+bootstrap4
 
 TODO:
-create bower package for assets
+create laravel package
+create symfony bundle

@@ -11,35 +11,126 @@
 
 namespace QueryBrowser;
 
-use QueryBrowser\PersistentState;
-use QueryBrowser\Result;
 use QueryBrowser\Exception\InvalidIdentifierException;
+use QueryBrowser\OrderBy;
+use QueryBrowser\QueryDriver\QueryDriverInterface;
+use QueryBrowser\RequestDriver\RequestDriverInterface;
+use QueryBrowser\StorageDriver\StorageDriverInterface;
+use QueryBrowser\SearchFilter;
 
 /**
- * .
+ * Base driver
  */
-class QueryBrowser extends PersistentState
+class QueryBrowser implements \Serializable
 {
-    protected $driver;
+    /**
+     * Unique ID
+     *
+     * @var string
+     */
+    protected $id;
 
     /**
-     * [__construct description]
-     * @param [type] $source [description]
+     *
+     *
+     * @var QueryDriverInterface
      */
-    public function __construct($driver)
-    {
-        $this->driver = $driver;
+    protected $queryDriver;
 
-        $id = $driver->getId();
-        if (empty($id)) {
-            throw new InvalidIdentifierException('Identifier must not be empty.');
+    /**
+     *
+     *
+     * @var RequestDriverInterface
+     */
+    protected $requestDriver;
+
+    /**
+     *
+     *
+     * @var StorageDriverInterface
+     */
+    protected $storageDriver;
+
+    /**
+     * Pagenumber
+     *
+     * @var int
+     */
+    protected $page = 1;
+
+    /**
+     * Pagesize
+     *
+     * Set to zero for no limit
+     *
+     * @var int
+     */
+    protected $pageSize = 25;
+
+    /**
+     * @TODO
+     *
+     * @var OrderBy
+     */
+    protected $orderBy;
+
+    /**
+     * @TODO
+     *
+     * @var SearchFilter
+     */
+    protected $searchFilter;
+
+    /**
+     * Constructor
+     *
+     * @param string $id
+     * @param QueryDriverInterface $queryDriver
+     *
+     * @return void
+     *
+     * @throws InvalidIdentifierException When id is empty or invalid
+     */
+    public function __construct(
+        string $id,
+        QueryDriverInterface $queryDriver,
+        RequestDriverInterface $requestDriver,
+        StorageDriverInterface $storageDriver
+    )
+    {
+        if ('' === $id) {
+            throw new InvalidIdentifierException('Identifier can not be empty.');
         }
-        
-        $this->setId('qb_' . $id);
+
+        if (false === preg_match('/[a-zA-Z0-9]+/', $id)) {
+            throw new InvalidIdentifierException(
+                sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
+            );
+        }
+
+        // always prefix the id
+        $this->id = 'qb_' . $id;
+
+        $this->queryDriver = $queryDriver;
+        $this->requestDriver = $requestDriver;
+        $this->storageDriver = $storageDriver;
+
+        $this->orderBy = new OrderBy();
+        $this->searchFilter = new SearchFilter();
     }
 
     /**
-     * Get the id.
+     * Get the driver
+     *
+     * @return QueryDriverInterface
+     */
+    public function getQueryDriver()
+    {
+        return $this->queryDriver;
+    }
+
+    /**
+     * Get the id
      *
      * @return string
      */
@@ -48,14 +139,10 @@ class QueryBrowser extends PersistentState
         return $this->id;
     }
 
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
     /**
-     * [getPage description]
-     * @return [type] [description]
+     * Get page
+     *
+     * @return int
      */
     public function getPage()
     {
@@ -63,19 +150,25 @@ class QueryBrowser extends PersistentState
     }
 
     /**
-     * [setPage description]
-     * @param [type] $page [description]
+     * Set page
+     *
+     * @param int $page
+     *
+     * @return self
      */
-    public function setPage($page)
+    public function setPage(int $page)
     {
-        if (is_numeric($page) && $page > 0) {
+        if ($page > 0) {
             $this->page = $page;
         }
+
+        return $this;
     }
 
     /**
-     * [getPageSize description]
-     * @return [type] [description]
+     * Get pagesize
+     *
+     * @return int
      */
     public function getPageSize()
     {
@@ -83,71 +176,169 @@ class QueryBrowser extends PersistentState
     }
 
     /**
-     * [setPageSize description]
-     * @param [type] $pageSize [description]
+     * Set pagesize
+     *
+     * @param int $pageSize
+     *
+     * @return self
      */
-    public function setPageSize($pageSize)
+    public function setPageSize(int $pageSize)
     {
-        if (is_numeric($pageSize) && $pageSize >= 0) {
+        if ($pageSize >= 0) {
             $this->pageSize = $pageSize;
         }
+
+        return $this;
     }
 
-    public function getOrderBy()
+    /**
+     * Get the results from the driver and add this to a new Result.
+     *
+     * @return Result
+     */
+    public function execute()
     {
-        return $this->orderBy;
+        // load state from storage
+        $this->loadStateFromStorage();
+
+        // get state from request
+        $this->getStateFromRequest();
+
+        // get the results from the driver
+        $results = $this->queryDriver->getResults(
+            $this->orderBy,
+            $this->searchFilter,
+            $this->getOffset(),
+            $this->pageSize
+        );
+
+        // get total number if results from the driver
+        $totalResults = $this->queryDriver->getTotalResults($this->orderBy, $this->searchFilter);
+
+        // somehow we have a page that is out of reach
+        if (count($results) === 0 && $totalResults > 0 && $this->page > 1) {
+            $this->requestDriver->set('qbId', $this->id);
+            $this->requestDriver->set('qbPage', 1);
+
+            return $this->execute();
+        }
+
+        // save state to storage
+        $this->saveStateToStorage();
+
+        $result = new Result($results, $totalResults, $this);
+
+        return $result;
     }
 
-    public function setOrderBy($orderBy)
+    /**
+     * Get offset
+     *
+     * @return int
+     */
+    public function getOffset()
     {
-        $this->orderBy = $orderBy;
-    }
-
-    public function getOrderDirection()
-    {
-        return $this->orderDirection;
-    }
-
-    public function setOrderDirection($orderDirection)
-    {
-        $this->orderDirection = $orderDirection;
-    }
-    
-    public function getGlobalSearch()
-    {
-        return $this->globalSearch;
-    }
-
-    public function setGlobalSearch($globalSearch)
-    {
-        $this->globalSearch = $globalSearch;
+        return ($this->page - 1) * $this->pageSize;
     }
 
     /**
      * .
      *
-     * @return QueryBrowser\Result
+     * @return array
      */
-    public function execute()
+    public function serialize()
     {
-        $this->loadStateFromStorage();
-        $this->setStateFromRequest();
-        $this->saveStateToStorage();
-
-        $this->driver->copyState($this);
-
-        $results = $this->driver->getResults();
-        $totalResults = $this->driver->getTotalResults();
-
-        // somehow we have a page that is out of reach
-        if (count($results) == 0 && $totalResults > 0 && $this->page > 1) {
-            $_GET['qbId'] = $this->id;
-            $_GET['qbPage'] = 1;
-            return $this->execute();
-        }
-
-        $result = new Result($results, $totalResults);
-        $result->copyState($this);
-        return $result;
+        return serialize([
+            'id'           => $this->id,
+            'page'         => $this->page,
+            'pageSize'     => $this->pageSize,
+            'orderBy'      => $this->orderBy,
+            'searchFilter' => $this->searchFilter,
+        ]);
     }
+
+    /**
+     * .
+     *
+     * @param  string $data
+     *
+     * @return void
+     */
+    public function unserialize($data)
+    {
+        $data = unserialize($data);
+
+        if (is_array($data)) {
+            $this->loadStateFromArray($data);
+        }
+    }
+
+    /**
+     * .
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function loadStateFromArray(array $data)
+    {
+        if (isset($data['id']) && $data['id'] === $this->id) {
+            if (isset($data['page'])) {
+                $this->setPage($data['page']);
+            }
+
+            if (isset($data['pageSize'])) {
+                $this->setPageSize($data['pageSize']);
+            }
+
+            /*
+            if (isset($data['globalSearch'])) {
+                $this->setGlobalSearch($data['globalSearch']);
+            }
+
+            if (isset($data['orderBy'])) {
+                $this->setOrderBy($data['orderBy']);
+            }
+            */
+        }
+    }
+
+    /**
+     * .
+     *
+     * @return void
+     */
+    protected function loadStateFromStorage()
+    {
+        $data = $this->storageDriver->get($this->id);
+
+        if (null !== $data) {
+            $this->unserialize($data);
+        }
+    }
+
+    /**
+     * .
+     *
+     * @return void
+     */
+    protected function getStateFromRequest()
+    {
+        $data = $this->requestDriver->getAll($this->id);
+
+        if (null !== $data) {
+            $this->loadStateFromArray($data);
+        }
+    }
+
+    /**
+     * .
+     *
+     * @return void
+     */
+    protected function saveStateToStorage()
+    {
+        return $this->storageDriver->set($this->id, $this->serialize());
+    }
+
 }

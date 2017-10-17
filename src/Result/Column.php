@@ -21,15 +21,15 @@ class Column
     protected $visible = true;
     protected $orderable = true;
     protected $searchable = true;
-    protected $textAlign  = 'left'; // left, middle, right
+    protected $textAlign = 'left'; // left, center, right
     protected $orderDirection; // null, 'asc', 'desc'
+    protected $class;
     protected $callback;
 
-    public function __construct($id, $sequence)
+    public function __construct(string $id)
     {
         $this->id = $id;
         $this->name = $id;
-        $this->sequence = $sequence;
     }
 
     public function getId()
@@ -45,6 +45,8 @@ class Column
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function isOrderable()
@@ -52,9 +54,11 @@ class Column
         return $this->orderable;
     }
 
-    public function setOrderable($orderable)
+    public function setOrderable(bool $orderable)
     {
         $this->orderable = $orderable;
+
+        return $this;
     }
 
     public function isVisible()
@@ -62,9 +66,11 @@ class Column
         return $this->visible;
     }
 
-    public function setVisible($visible)
+    public function setVisible(bool $visible)
     {
         $this->visible = $visible;
+
+        return $this;
     }
 
     public function getTextAlign()
@@ -74,7 +80,13 @@ class Column
 
     public function setTextAlign($textAlign)
     {
-        $this->textAlign = $textAlign;
+        if (in_array($textAlign, ['left', 'center', 'right']) {
+            $this->textAlign = $textAlign;
+        } else {
+            //@todo
+            //throw new
+        }
+        return $this;
     }
 
     public function getOrderDirection()
@@ -84,6 +96,13 @@ class Column
 
     public function setOrderDirection($orderDirection)
     {
-        $this->orderDirection = $orderDirection;
+        if (in_array($orderDirection, [null, 'asc', 'desc']) {
+            $this->orderDirection = $orderDirection;
+        } else {
+            //@todo
+            //throw new
+        }
+
+        return $this;
     }
 }

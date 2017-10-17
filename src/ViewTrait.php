@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the QueryBrowser package.
- * 
+ *
  * (c) Paul Hekkema <paul@hekkema.nl>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -13,15 +13,15 @@ namespace QueryBrowser;
 
 trait ViewTrait
 {
-    
     /**
      * Replace placeholders within the uri using data from the current result.
      *
-     * @param  string  $uri
-     * @param  array   $result
+     * @param  string $uri
+     * @param  array  $result
+     *
      * @return string
      */
-    public function rewriteUriPlaceholders($uri, &$result)
+    public function rewriteUriPlaceholders(string $uri, array $result)
     {
         // find placeholders
         preg_match_all('#<([a-zA-Z0-9_]++)>#', $uri, $matches);
@@ -41,10 +41,11 @@ trait ViewTrait
     /**
      * Highlight the searchString.
      *
-     * @param  string  $haystack
+     * @param  string $haystack
+     *
      * @return string
      */
-    public function highlightString($needle, $haystack)
+    public function highlightString(srting $needle, string $haystack)
     {
         if (substr($haystack, 0, 1) != '<') {
             return preg_replace(sprintf('/(%s)/i', str_replace('/', '\/', $needle)), '<span class="highlight">\\1</span>', $haystack);

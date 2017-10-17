@@ -11,13 +11,9 @@
  * file that was distributed with this source code.
  */
 
-namespace QueryBrowser\Exception;
+namespace QueryBrowser;
 
-use QueryBrowser\Exception\Exception;
-
-/**
- * InvalidIdentifierException is thrown when the identifier is empty or invalid.
- */
-class InvalidIdentifierException extends Exception
+class SearchFilter
 {
+
 }

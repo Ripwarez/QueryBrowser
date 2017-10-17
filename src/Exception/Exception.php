@@ -13,11 +13,9 @@
 
 namespace QueryBrowser\Exception;
 
-use QueryBrowser\Exception\Exception;
-
 /**
- * InvalidIdentifierException is thrown when the identifier is empty or invalid.
+ * Exception
  */
-class InvalidIdentifierException extends Exception
+class Exception extends \Exception
 {
 }

@@ -23,14 +23,26 @@ class View
 
     protected $data;
 
-    public function __construct($file, &$data)
+    /**
+     * Construct a new QueryBrowser\View
+     *
+     * @param string $file
+     * @param array  $data
+     *
+     * @return void
+     */
+    public function __construct(string $file, array $data)
     {
         $this->file = $file;
         $this->data = $data;
     }
 
     /**
-     * sets only variables that the view may have
+     * Render the view
+     *
+     * Only sets variables that the view may access
+     *
+     * @return void
      */
     public function render()
     {

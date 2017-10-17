@@ -11,42 +11,67 @@
 
 namespace QueryBrowser;
 
-use QueryBrowser\State;
-use QueryBrowser\View;
-use QueryBrowser\Result\Column;
 use QueryBrowser\Exception\ViewNotFoundException;
+use QueryBrowser\OrderBy;
+use QueryBrowser\Result\Column;
 
 /**
  * class Result
  */
-class Result extends State
+class Result
 {
-    protected $columns;
-
+    /**
+     *
+     *
+     * @var array
+     */
     protected $results;
 
+    /**
+     *
+     *
+     * @var int
+     */
     protected $totalResults;
 
     /**
-     * Constructs a new QueryBrowser\Result.
      *
-     * @param
+     *
+     * @var Column[]
+     */
+    protected $columns = [];
+
+    /**
+     *
+     *
+     * @var QueryBrowser
+     */
+    protected $qb;
+
+    /**
+     * Construct a new QueryBrowser\Result.
+     *
+     * @param array $results
+     * @param int   $totalResults
+     *
      * @return  void
      */
-    public function __construct(&$results, $totalResults)
+    public function __construct(array $results, int $totalResults, QueryBrowser $qb)
     {
         $this->results = $results;
         $this->totalResults = $totalResults;
-        
-        $this->columns = [];
+        $this->qb = $qb;
+
         if (count($results) > 0) {
             $result = reset($results);
             foreach (array_keys($result) as $i => $name) {
                 $column = new Column($name, $i);
 
-                if ($name == $this->orderBy) {
-                    $column->setOrderDirection($this->orderDirection);
+                /*
+                if ($name === $driver->getOrderBy()) {
+                    $column->setOrderDirection($driver->getOrderDirection());
                 }
+                */
 
                 $this->columns[$name] = $column;
             }
@@ -56,50 +81,55 @@ class Result extends State
     /**
      * Renders
      *
-     * @param   array
-     * @return  string  output (HTML)
+     * @param array
+     *
+     * @return string  output (HTML)
+     *
+     * @throws ViewNotFoundException When view is not found
      */
-    public function render($config = [], $file = '')
+    public function render(array $config = [], string $file = '')
     {
         if ($file == '') {
             $file = dirname(__FILE__) . '/Resources/views/qbr.php';
         }
 
-        if (!file_exists($file)) {
+        if (false === file_exists($file)) {
             throw new ViewNotFoundException(sprintf('Unable to find file %s.', $file));
         }
 
-        $config = array_merge([
-                'createURI'   => '',
-                'updateURI'   => '',
-                'sortURI'     => '',
-                'deleteURI'   => '',
+        $config = array_merge(
+            [
+                'createURI' => '',
+                'updateURI' => '',
+                'sortURI'   => '',
+                'deleteURI' => '',
             ],
             $config
         );
 
-        $totalPages = ceil($this->totalResults / $this->pageSize);
+        $totalPages = ceil($this->totalResults / $this->qb->getPageSize());
         $nrResults = count($this->results);
-        $offset = $this->getOffset();
+        $page = $this->qb->getPage();
+        $offset = $this->qb->getOffset();
 
         $data = [
-            'id'              => $this->id,
+            'id'              => $this->qb->getId(),
             'results'         => $this->results,
             'columns'         => $this->columns,
-            'orderBy'         => $this->orderBy,
-            'orderDirection'  => $this->orderDirection,
-            'globalSearch'    => $this->globalSearch,
+            //'orderBy'         => $this->orderBy,
+            //'orderDirection'  => $this->orderDirection,
+            //'globalSearch'    => $this->globalSearch,
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
             'nrResults'       => $nrResults,
             'totalResults'    => $this->totalResults,
             'totalPages'      => $totalPages,
-            'currentPage'     => $this->page,
-            'previousPage'    => ($this->page > 1) ? $this->page - 1 : 0,
-            'nextPage'        => ($this->page < $totalPages) ? $this->page + 1 : 0,
-            'firstPage'       => ($this->page != 1) ? 1: 0,
-            'lastPage'        => ($this->page < $totalPages) ? $totalPages : 0,
-            'pageSize'        => $this->pageSize,
+            'currentPage'     => $page,
+            'previousPage'    => ($page > 1) ? $page - 1 : 0,
+            'nextPage'        => ($page < $totalPages) ? $page + 1 : 0,
+            'firstPage'       => ($page != 1) ? 1 : 0,
+            'lastPage'        => ($page < $totalPages) ? $totalPages : 0,
+            'pageSize'        => $this->qb->getPageSize(),
             'pageSizeOptions' => [10, 25, 50, 100],
             'createURI'       => $config['createURI'],
             'updateURI'       => $config['updateURI'],
@@ -107,6 +137,7 @@ class Result extends State
         ];
 
         $view = new View($file, $data);
+
         return $view->render();
     }
 
@@ -116,20 +147,22 @@ class Result extends State
      * The first parameter of the user function will contain the value of the record.
      * Extra parameters needed for the user function can be added to this function parameters.
      *
-     * @param   string  $columnId      column
-     * @param   string  $function         callback function
-     * @param   bool    $resultParameter  use $row as second parameter in callback function
+     * @param   string $columnId        column
+     * @param   string $function        callback function
+     * @param   bool   $resultParameter use $row as second parameter in callback function
+     *
      * @return  void
      */
-    public function callFunctionOnColumn($columnId, $function, $resultParameter = false)
+    public function callFunctionOnColumn(string $columnId, string $function, bool $resultParameter = false)
     {
+        // @ throw exception if not set
         if (isset($this->columns[$columnId])) {
             $userArgs = array_slice(func_get_args(), 2);
             foreach ($this->results as $i => $row) {
                 if ($resultParameter) {
-                    $callbackParams = array_merge(array($this->results[$i][$columnId]), array($row), $userArgs);
+                    $callbackParams = array_merge([$this->results[$i][$columnId]], [$row], $userArgs);
                 } else {
-                    $callbackParams = array_merge(array($this->results[$i][$columnId]), $userArgs);
+                    $callbackParams = array_merge([$this->results[$i][$columnId]], $userArgs);
                 }
                 $this->results[$i][$columnId] = call_user_func_array($function, $callbackParams);
             }
@@ -139,14 +172,15 @@ class Result extends State
     /**
      * Adds a (static) column.
      *
-     * @param   string  $f       column
-     * @param   int     $offset  offset, 0 is first, -1 is last
-     * @param   string  $dv      default value
+     * @param   string $f      column
+     * @param   int    $offset offset, 0 is first, -1 is last
+     *
      * @return  void
      */
-    public function addColumn($columnId, $value = null, $offset = -1)
+    public function addColumn(string $columnId, string $value = null, int $offset = -1)
     {
         if (isset($this->columns[$columnId])) {
+            // @todo throw exception
             return false;
         } else {
             $this->addValueToArray($this->columns, $columnId, $columnId, $offset);
@@ -162,16 +196,18 @@ class Result extends State
     /**
      * Add a value to an array at specified offset.
      *
-     * @param  array   $arr
-     * @param  string  $key
-     * @param  string  $value
-     * @param  int     $offset
+     * @param  array  $arr
+     * @param  string $key
+     * @param  string $value
+     * @param  int    $offset
+     *
+     * @return  void
      */
-    private function addValueToArray(&$arr, $key, $value, $offset)
+    private function addValueToArray(array $arr, string $key, string $value, int $offset)
     {
         switch ($offset) {
             case 0: // first
-                $arr = array($key => $value) + $arr;
+                $arr = [$key => $value] + $arr;
                 break;
 
             case -1: // last
@@ -181,7 +217,7 @@ class Result extends State
             default:
                 $part1 = array_slice($arr, 0, $offset, true);
                 $part2 = array_slice($arr, $offset, count($arr), true);
-                $arr = array_merge($part1, array($key => $value), $part2);
+                $arr = array_merge($part1, [$key => $value], $part2);
                 break;
         }
     }

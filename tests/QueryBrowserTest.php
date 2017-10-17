@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-use QueryBrowser\QueryBrowserFactory;
+use PHPUnit\Framework\TestCase;
+use QueryBrowser\Factory;
 
 /**
   *
   */
-class QueryBrowserTest extends PHPUnit_Framework_TestCase
+class QueryBrowserTest extends TestCase
 {
     /**
      * [test description]
@@ -22,9 +23,7 @@ class QueryBrowserTest extends PHPUnit_Framework_TestCase
      */
     public function test()
     {
-        
-        
-        $qb = QueryBrowserFactory::create([]);
+        $qb = Factory::create([], null, new \QueryBrowser\StorageDriver\NullDriver());
         $qbr = $qb->execute();
         $html = $qbr->render();
         echo $html;

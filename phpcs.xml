@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset>
+    <!-- directories and files to scan -->
+    <file>src/</file>
+
+    <!-- directories and files to exclude -->
+    <!--<exclude-pattern>/tests</exclude-pattern>-->
+
+    <!-- show progress -->
+    <arg value="p"/>
+
+    <!-- Use PSR2 -->
+    <rule ref="PSR2"/>
+</ruleset>
