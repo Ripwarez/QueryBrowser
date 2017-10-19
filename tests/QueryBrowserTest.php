@@ -10,23 +10,36 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use QueryBrowser\Factory;
+use QueryBrowser\QueryBrowser;
+use QueryBrowser\QueryDriver\ArrayDriver;
+use QueryBrowser\RequestDriver\SuperGlobalDriver;
+use QueryBrowser\StorageDriver\NullDriver;
+
 
 /**
-  *
-  */
+ * @covers QueryBrowser
+ */
 class QueryBrowserTest extends TestCase
 {
     /**
-     * [test description]
-     * @return [type] [description]
+     * @expectedException QueryBrowser\Exception\InvalidIdentifierException
+     *
+     * @dataProvider idProvider
      */
-    public function test()
+    public function testInvalidIdentifierException($id)
     {
-        $qb = Factory::create([], null, new \QueryBrowser\StorageDriver\NullDriver());
-        $qbr = $qb->execute();
-        $html = $qbr->render();
-        echo $html;
-        //$this->assertTrue($nacho->hasCheese());
+        $arrayDriver = $this->createMock(ArrayDriver::class);
+        $requestDriver = $this->createMock(SuperGlobalDriver::class);
+        $storageDriver = $this->createMock(NullDriver::class);
+
+        new QueryBrowser($id, $arrayDriver, $requestDriver, $storageDriver);
+    }
+
+    public function idProvider()
+    {
+        return [
+            [''],
+            ['-']
+        ];
     }
 }

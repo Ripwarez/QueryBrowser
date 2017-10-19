@@ -11,61 +11,167 @@
 
 namespace QueryBrowser\Result;
 
+use QueryBrowser\Exception\InvalidArgumentException;
+
 /**
- *
+ * Column
  */
 class Column
 {
+    /**
+     *
+     *
+     * @var string
+     */
     protected $id;
-    protected $name;
-    protected $visible = true;
-    protected $orderable = true;
-    protected $searchable = true;
-    protected $textAlign = 'left'; // left, center, right
-    protected $orderDirection; // null, 'asc', 'desc'
-    protected $class;
-    protected $callback;
 
-    public function __construct(string $id)
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     *
+     *
+     * @var int
+     */
+    protected $sequence;
+
+    /**
+     *
+     *
+     * @var bool
+     */
+    protected $visible = true;
+
+    /**
+     *
+     *
+     * @var bool
+     */
+    protected $orderable = true;
+
+    /**
+     *
+     *
+     * @var bool
+     */
+    protected $searchable = true;
+
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $textAlign = 'left';
+
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $orderDirection = null;
+
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * Constructor
+     *
+     * @param string $id
+     * @param int    $sequence
+     *
+     * @return void
+     */
+    public function __construct(string $id, int $sequence)
     {
         $this->id = $id;
         $this->name = $id;
+
+        $this->sequence = $sequence * 100;
     }
 
+    /**
+     * Get id
+     *
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Get name
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
-    public function setName($name)
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return self
+     */
+    public function setName(string $name)
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function isOrderable()
+    /**
+     * Get sequence
+     *
+     * @return int
+     */
+    public function getSequence()
     {
-        return $this->orderable;
+        return $this->name;
     }
 
-    public function setOrderable(bool $orderable)
+    /**
+     * Set sequence
+     *
+     * @param int $sequence
+     *
+     * @return self
+     */
+    public function setSequence(int $sequence)
     {
-        $this->orderable = $orderable;
+        $this->sequence = $sequence;
 
         return $this;
     }
 
+    /**
+     * Is visible or not
+     *
+     * @return bool
+     */
     public function isVisible()
     {
         return $this->visible;
     }
 
+    /**
+     * Set visible
+     *
+     * @param bool $visible
+     *
+     * @return self
+     */
     public function setVisible(bool $visible)
     {
         $this->visible = $visible;
@@ -73,35 +179,86 @@ class Column
         return $this;
     }
 
+    /**
+     * Can be ordered or not
+     *
+     * @return bool
+     */
+    public function isOrderable()
+    {
+        return $this->orderable;
+    }
+
+    /**
+     * Set orderable
+     *
+     * @param bool $orderable
+     *
+     * @return self
+     */
+    public function setOrderable(bool $orderable)
+    {
+        $this->orderable = $orderable;
+
+        return $this;
+    }
+
+    /**
+     * Get text alignment
+     *
+     * @return string
+     */
     public function getTextAlign()
     {
         return $this->textAlign;
     }
 
-    public function setTextAlign($textAlign)
+    /**
+     * Set text alignment
+     *
+     * @param string $textAlign
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setTextAlign(string $textAlign)
     {
-        if (in_array($textAlign, ['left', 'center', 'right']) {
-            $this->textAlign = $textAlign;
-        } else {
-            //@todo
-            //throw new
+        if (false === in_array($textAlign, ['left', 'center', 'right'])) {
+            throw new InvalidArgumentException("The value must be 'left', 'center' or 'right'.");
         }
+
+        $this->textAlign = $textAlign;
+
         return $this;
     }
 
+    /**
+     * Get order direction
+     *
+     * @return string
+     */
     public function getOrderDirection()
     {
         return $this->orderDirection;
     }
 
-    public function setOrderDirection($orderDirection)
+    /**
+     * Set order direction
+     *
+     * @param string $orderDirection
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setOrderDirection(string $orderDirection)
     {
-        if (in_array($orderDirection, [null, 'asc', 'desc']) {
-            $this->orderDirection = $orderDirection;
-        } else {
-            //@todo
-            //throw new
+        if (false === in_array($orderDirection, [null, 'asc', 'desc'])) {
+            throw new InvalidArgumentException("The value must be null, 'asc' or 'desc'.");
         }
+
+        $this->orderDirection = $orderDirection;
 
         return $this;
     }

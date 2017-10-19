@@ -14,6 +14,7 @@ namespace QueryBrowser;
 use QueryBrowser\Exception\ViewNotFoundException;
 use QueryBrowser\OrderBy;
 use QueryBrowser\Result\Column;
+use QueryBrowser\Exception\InvalidArgumentException;
 
 /**
  * class Result
@@ -145,27 +146,29 @@ class Result
      * Call an user-defined function on a column.
      *
      * The first parameter of the user function will contain the value of the record.
+     * The second parameter of the user function will contain the complete record.
      * Extra parameters needed for the user function can be added to this function parameters.
      *
      * @param   string $columnId        column
      * @param   string $function        callback function
-     * @param   bool   $resultParameter use $row as second parameter in callback function
      *
      * @return  void
      */
-    public function callFunctionOnColumn(string $columnId, string $function, bool $resultParameter = false)
+    public function callFunctionOnColumn(string $columnId, string $function)
     {
-        // @ throw exception if not set
-        if (isset($this->columns[$columnId])) {
-            $userArgs = array_slice(func_get_args(), 2);
-            foreach ($this->results as $i => $row) {
-                if ($resultParameter) {
-                    $callbackParams = array_merge([$this->results[$i][$columnId]], [$row], $userArgs);
-                } else {
-                    $callbackParams = array_merge([$this->results[$i][$columnId]], $userArgs);
-                }
-                $this->results[$i][$columnId] = call_user_func_array($function, $callbackParams);
-            }
+        if (false === isset($this->columns[$columnId])) {
+            throw new InvalidArgumentException(sprintf('Unknown column: %s', $columnId));
+        }
+
+        // get user arguments
+        $userArgs = array_slice(func_get_args(), 2);
+
+        foreach ($this->results as $i => $row) {
+            // merge callback parameters
+            $callbackParams = array_merge([$this->results[$i][$columnId]], [$row], $userArgs);
+
+            // apply function
+            $this->results[$i][$columnId] = call_user_func_array($function, $callbackParams);
         }
     }
 
@@ -175,50 +178,24 @@ class Result
      * @param   string $f      column
      * @param   int    $offset offset, 0 is first, -1 is last
      *
-     * @return  void
+     * @return Column
      */
-    public function addColumn(string $columnId, string $value = null, int $offset = -1)
+    public function addColumn(string $columnId, int $sequence, string $value = null)
     {
         if (isset($this->columns[$columnId])) {
-            // @todo throw exception
-            return false;
-        } else {
-            $this->addValueToArray($this->columns, $columnId, $columnId, $offset);
-            foreach ($this->results as $k => $v) {
-                $this->addValueToArray($this->results[$k], $columnId, $value, $offset);
-            }
-            $column = new Column($columnId, $columnId);
-            $column->setOrderable(false);
-            $this->columns[$columnId] = $column;
+            throw new InvalidArgumentException(sprintf('Unknown column: %s', $columnId));
         }
-    }
 
-    /**
-     * Add a value to an array at specified offset.
-     *
-     * @param  array  $arr
-     * @param  string $key
-     * @param  string $value
-     * @param  int    $offset
-     *
-     * @return  void
-     */
-    private function addValueToArray(array $arr, string $key, string $value, int $offset)
-    {
-        switch ($offset) {
-            case 0: // first
-                $arr = [$key => $value] + $arr;
-                break;
+        // add column
+        $column = new Column($columnId, $sequence);
+        $column->setOrderable(false);
+        $this->columns[$columnId] = $column;
 
-            case -1: // last
-                $arr[$key] = $value;
-                break;
-
-            default:
-                $part1 = array_slice($arr, 0, $offset, true);
-                $part2 = array_slice($arr, $offset, count($arr), true);
-                $arr = array_merge($part1, [$key => $value], $part2);
-                break;
+        // set value
+        foreach ($this->results as $k => $v) {
+            $this->results[$k][$columnId] = $value;
         }
+
+        return $column;
     }
 }

@@ -11,6 +11,9 @@
 
 namespace QueryBrowser;
 
+/**
+ *
+ */
 trait ViewTrait
 {
     /**

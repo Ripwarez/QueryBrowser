@@ -44,7 +44,7 @@ class Factory
      *
      * @return QueryBrowser
      *
-     * @throws DriverNotFoundException    When unable to determine driver
+     * @throws DriverNotFoundException When unable to determine driver
      */
     public static function create(
         $sourceObject,
@@ -68,7 +68,7 @@ class Factory
         }
 
         if ('' === $queryDriverClass) {
-            throw new DriverNotFoundException('Unable to determine driver.');
+            throw new DriverNotFoundException('Unable to determine QueryDriver.');
         }
 
         // create the querydriver
@@ -86,7 +86,6 @@ class Factory
         if (null === $storageDriver) {
             $storageDriver = new CookieDriver();
         }
-
 
         return new QueryBrowser($id, $queryDriver, $requestDriver, $storageDriver);
     }

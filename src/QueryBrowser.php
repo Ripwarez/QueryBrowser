@@ -19,7 +19,7 @@ use QueryBrowser\StorageDriver\StorageDriverInterface;
 use QueryBrowser\SearchFilter;
 
 /**
- * Base driver
+ * QueryBrowser
  */
 class QueryBrowser implements \Serializable
 {
@@ -102,7 +102,7 @@ class QueryBrowser implements \Serializable
             throw new InvalidIdentifierException('Identifier can not be empty.');
         }
 
-        if (false === preg_match('/[a-zA-Z0-9]+/', $id)) {
+        if (0 === preg_match('/[a-zA-Z0-9]+/', $id)) {
             throw new InvalidIdentifierException(
                 sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
             );
@@ -242,7 +242,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Serialize
      *
      * @return array
      */
@@ -258,7 +258,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Unserialize
      *
      * @param  string $data
      *
@@ -274,7 +274,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Load the state from an array.
      *
      * @param array $data
      *
@@ -304,7 +304,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Load state from the storage driver.
      *
      * @return void
      */
@@ -318,7 +318,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Get state from the request driver.
      *
      * @return void
      */
@@ -332,7 +332,7 @@ class QueryBrowser implements \Serializable
     }
 
     /**
-     * .
+     * Save state using the storage driver.
      *
      * @return void
      */

@@ -11,12 +11,13 @@
  * file that was distributed with this source code.
  */
 
-namespace QueryBrowser;
+namespace QueryBrowser\Exception;
+
+use QueryBrowser\Exception\Exception;
 
 /**
- *
+ * InvalidArgumentException is thrown when an invalid argument is supplied.
  */
-class SearchFilter
+class InvalidArgumentException extends Exception
 {
-
 }
