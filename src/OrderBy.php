@@ -11,6 +11,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace QueryBrowser;
 
 use QueryBrowser\Exception\InvalidArgumentException;
@@ -26,7 +28,9 @@ class OrderBy
 
 	public function __construct(string $field = null, string $direction = null)
 	{
-		$direction = strtolower($direction);
+		if (is_string($direction)) {
+			$direction = strtolower($direction);
+		}
 
 		if (false === in_array($direction, [null, 'asc', 'desc'])) {
             throw new InvalidArgumentException("The value must be null, 'asc' or 'desc'.");

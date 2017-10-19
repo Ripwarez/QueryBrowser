@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/paulhekkema/querybrowser.svg?branch=develop)](https://travis-ci.org/paulhekkema/querybrowser})
+
 # QueryBrowser
 
 QueryBrowser
