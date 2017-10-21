@@ -82,9 +82,9 @@ class QueryBrowser implements \Serializable
     /**
      * @TODO
      *
-     * @var FilterManager
+     * @var SearchManager
      */
-    protected $filterManager;
+    protected $searchManager;
 
     /**
      * Constructor
@@ -120,7 +120,7 @@ class QueryBrowser implements \Serializable
         $this->storageDriver = $storageDriver;
 
         $this->orderBy = new OrderBy();
-        $this->filterManager = new FilterManager();
+        $this->searchManager = new SearchManager();
     }
 
     /**
@@ -216,6 +216,16 @@ class QueryBrowser implements \Serializable
     }
 
     /**
+     * Get search manager
+     *
+     * @return SearchManager
+     */
+    public function getSearchManager()
+    {
+        return $this->searchManager;
+    }
+
+    /**
      * Get the results from the driver and add this to a new Result.
      *
      * @return Result
@@ -237,13 +247,13 @@ class QueryBrowser implements \Serializable
         // get the results from the driver
         $results = $this->queryDriver->getResults(
             $this->orderBy,
-            $this->filterManager,
+            $this->searchManager,
             $this->getOffset(),
             $this->pageSize
         );
 
         // get total number if results from the driver
-        $totalResults = $this->queryDriver->getTotalResults($this->orderBy, $this->filterManager);
+        $totalResults = $this->queryDriver->getTotalResults($this->orderBy, $this->searchManager);
 
         // somehow we have a page that is out of reach
         if (count($results) === 0 && $totalResults > 0 && $this->page > 1) {
@@ -279,11 +289,11 @@ class QueryBrowser implements \Serializable
     public function serialize()
     {
         return serialize([
-            'id'            => $this->id,
-            'page'          => $this->page,
-            'pageSize'      => $this->pageSize,
-            'orderBy'       => $this->orderBy->toArray(),
-            'filterManager' => serialize($this->filterManager),
+            'id'       => $this->id,
+            'page'     => $this->page,
+            'pageSize' => $this->pageSize,
+            'orderBy'  => $this->orderBy->toArray(),
+            'search'   => $this->searchManager->toArray(),
         ]);
     }
 
@@ -319,11 +329,9 @@ class QueryBrowser implements \Serializable
                 $this->setPageSize((int) $data['pageSize']);
             }
 
-            /*
-            if (isset($data['globalSearch'])) {
-                $this->setGlobalSearch($data['globalSearch']);
+            if (isset($data['search'])) {
+                //$this->setGlobalSearch($data['globalSearch']);
             }
-            */
 
             if (isset($data['orderBy'])) {
                 $this->orderBy = new OrderBy(

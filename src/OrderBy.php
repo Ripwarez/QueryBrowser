@@ -114,8 +114,8 @@ class OrderBy
         return ('' === $this->field || '' === $this->direction);
     }
 
-        /**
-     * Serialize
+    /**
+     * Convert this object to an array.
      *
      * @return array
      */

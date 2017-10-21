@@ -12,7 +12,7 @@ $(function () {
                     form.append('<input type="hidden" name="qb[id]" value="' + div.data('id') + '">');
                     form.append('<input type="hidden" name="qb[page]" value="' + div.data('page') + '">');
                     form.append('<input type="hidden" name="qb[pageSize]" value="' + div.data('pagesize') + '">');
-                    //form.append('<input type="hidden" name="qbGlobalSearch" value="' + div.data('globalsearch') + '">');
+                    form.append('<input type="hidden" name="qb[search][global]" value="' + div.data('globalsearch') + '">');
                     form.append('<input type="hidden" name="qb[orderBy][field]" value="' + div.data('orderby') + '">');
                     form.append('<input type="hidden" name="qb[orderBy][direction]" value="' + div.data('orderdirection') + '">');
                     $('body').append(form);
@@ -52,12 +52,11 @@ $(function () {
 
             doSearch: function (formId, searchString) {
                 var form = QBR.getForm(formId);
-                form.find('input[name=qbGlobalSearch]').val(searchString);
+                form.find('input[name="qb[search][global]"]').val(searchString);
                 QBR.gotoPage(formId, 1);
             },
 
             init: function () {
-                /*
                 $('input[name=qbr_q]').keypress(function (e) {
                     if (e.which == 13) {
                         var formId = $(this).parents('.qbr').data('id');
@@ -65,7 +64,6 @@ $(function () {
                         return false;
                     }
                 });
-                */
             }
         };
     }();

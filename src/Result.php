@@ -70,11 +70,10 @@ class Result
             foreach (array_keys($result) as $i => $name) {
                 $column = new Column($name, $i);
 
-                /*
-                if ($name === $qb->getOrderBy()) {
-                    $column->setOrderDirection($driver->getOrderDirection());
+                $orderBy = $qb->getOrderBy();
+                if ($name === $orderBy->getField()) {
+                    $column->setOrderDirection($orderBy->getDirection());
                 }
-                */
 
                 $this->columns[$name] = $column;
             }
@@ -114,14 +113,17 @@ class Result
         $nrResults = count($this->results);
         $page = $this->qb->getPage();
         $offset = $this->qb->getOffset();
+        $orderBy = $this->qb->getOrderBy();
+        $searchManager = $this->qb->getSearchManager();
+        $globalSearch = '';
 
         $data = [
             'id'              => $this->qb->getId(),
             'results'         => $this->results,
             'columns'         => $this->columns,
-            'orderBy'         => $this->qb->getOrderBy()->getField(),
-            'orderDirection'  => $this->qb->getOrderBy()->getDirection(),
-            //'globalSearch'    => $this->globalSearch,
+            'orderBy'         => $orderBy->getField(),
+            'orderDirection'  => $orderBy->getDirection(),
+            'globalSearch'    => $globalSearch,
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
             'nrResults'       => $nrResults,

@@ -17,7 +17,7 @@
         data-pagesize="<?php echo $pageSize; ?>"
         data-orderby="<?php echo $orderBy; ?>"
         data-orderdirection="<?php echo $orderDirection; ?>"
-        <?php //data-globalsearch="<?php echo $globalSearch; ?>"
+        data-globalsearch="<?php echo $globalSearch; ?>"
         data-form-action=""
         data-form-method="GET"
         data-use-ajax="0">
@@ -28,7 +28,7 @@
     <?php endif; ?>
 
     <div class="pull-right">
-        <?php /*<input type="text" name="qbr_q" class="form-control table-search" value="<?php echo $globalSearch; ?>" placeholder="Search">*/ ?>
+        <input type="text" name="qbr_q" class="form-control table-search" value="<?php echo $globalSearch; ?>" placeholder="Search">
     </div>
 
     <table class="table table-striped">

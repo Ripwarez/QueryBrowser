@@ -16,7 +16,8 @@ declare(strict_types=1);
 namespace QueryBrowser\Driver\Query;
 
 use QueryBrowser\OrderBy;
-use QueryBrowser\FilterManager;
+use QueryBrowser\SearchManager;
+use QueryBrowser\Search;
 
 /**
  * QueryDriver for an array.
@@ -77,11 +78,12 @@ class ArrayQueryDriver implements QueryDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function getResults(OrderBy $orderBy, FilterManager $filterManager, int $offset, int $limit)
+    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit)
     {
-        // if (!empty($this->globalSearch)) {
-        //     $this->applyGlobalSearch($this->globalSearch);
-        // }
+        // search
+        if (!$searchManager->isEmpty()) {
+            $this->applyGlobalSearch($searchManager->getGlobalSearch());
+        }
 
         // sort
         if (!$orderBy->isEmpty()) {
@@ -100,7 +102,7 @@ class ArrayQueryDriver implements QueryDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function getTotalResults(OrderBy $orderBy, FilterManager $filterManager)
+    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager)
     {
         return count($this->data);
     }
@@ -110,7 +112,7 @@ class ArrayQueryDriver implements QueryDriverInterface
      *
      * @return void
      */
-    protected function applyGlobalSearch($searchString)
+    protected function applyGlobalSearch(Search $search)
     {
         foreach ($this->data as $k => $row) {
             $found = false;
@@ -119,7 +121,7 @@ class ArrayQueryDriver implements QueryDriverInterface
                     $field = print_r($field, true);
                 }
 
-                if (false !== stripos($field, $searchString)) {
+                if (false !== stripos($field, $search->getQuery())) {
                     $found = true;
                     break;
                 }

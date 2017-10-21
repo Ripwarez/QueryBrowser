@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace QueryBrowser\Driver\Query;
 
 use QueryBrowser\OrderBy;
-use QueryBrowser\FilterManager;
+use QueryBrowser\SearchManager;
 
 /**
  * Interface implemented by QueryBrowser\QueryDriver classes.
@@ -47,12 +47,12 @@ interface QueryDriverInterface
      *
      * @return array Associative array having the column names as array keys.
      */
-    public function getResults(OrderBy $orderBy, FilterManager $filterManager, int $offset, int $limit);
+    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit);
 
     /**
      * Get the number of total available results.
      *
      * @return int
      */
-    public function getTotalResults(OrderBy $orderBy, FilterManager $filterManager);
+    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager);
 }
