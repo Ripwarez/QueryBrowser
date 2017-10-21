@@ -18,49 +18,112 @@ namespace QueryBrowser;
 use QueryBrowser\Exception\InvalidArgumentException;
 
 /**
- *
+ * The last order by from the source or the order by manually set by the user.
  */
 class OrderBy
 {
-	protected $field;
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $field;
 
-	protected $direction;
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $direction;
 
-	public function __construct(string $field = null, string $direction = null)
-	{
-		if (is_string($direction)) {
-			$direction = strtolower($direction);
-		}
+    /**
+     *
+     *
+     * @param string $field
+     * @param string $direction
+     *
+     * @return void
+     */
+    public function __construct(string $field = '', string $direction = '')
+    {
+        $this->field = $field;
+        $this->setDirection($direction);
+    }
 
-		if (false === in_array($direction, [null, 'asc', 'desc'])) {
-            throw new InvalidArgumentException("The value must be null, 'asc' or 'desc'.");
+    /**
+     *
+     *
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
+     *
+     *
+     * @param string $field
+     *
+     * @return self
+     */
+    public function setField(string $field)
+    {
+        $this->field = $field;
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @return string
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     *
+     *
+     * @param string $direction
+     *s
+     * @return self
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setDirection(string $direction)
+    {
+        if (false === in_array($direction, ['', 'asc', 'desc'])) {
+            throw new InvalidArgumentException("The value must be '', 'asc' or 'desc'.");
         }
 
-		$this->field = $field;
-		$this->direction = $direction;
-	}
+        $this->direction = $direction;
 
-	public function getField()
-	{
-		return $this->field;
-	}
+        return $this;
+    }
 
-	public function setField($field)
-	{
-		$this->field = $field;
+    /**
+     *
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return ('' === $this->field || '' === $this->direction);
+    }
 
-		return $this;
-	}
-
-	public function getDirection()
-	{
-		return $this->direction;
-	}
-
-	public function setDirection($direction)
-	{
-		$this->direction = $direction;
-
-		return $this;
-	}
+        /**
+     * Serialize
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'field' => $this->field,
+            'direction'  => $this->direction,
+        ];
+    }
 }

@@ -13,16 +13,15 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\QueryDriver;
+namespace QueryBrowser\Driver\Query;
 
-use QueryBrowser\QueryDriver\QueryDriverInterface;
 use QueryBrowser\OrderBy;
-use QueryBrowser\SearchFilter;
+use QueryBrowser\FilterManager;
 
 /**
  * QueryDriver for an array.
  */
-class ArrayDriver implements QueryDriverInterface
+class ArrayQueryDriver implements QueryDriverInterface
 {
     /**
      * Source data
@@ -70,20 +69,26 @@ class ArrayDriver implements QueryDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function getResults(OrderBy $orderBy, SearchFilter $searchFilter, int $offset, int $limit)
+    public function getOrderBy()
     {
-        /*
-        if (!empty($this->globalSearch)) {
-            $this->applyGlobalSearch($this->globalSearch);
-        }
+        return new OrderBy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getResults(OrderBy $orderBy, FilterManager $filterManager, int $offset, int $limit)
+    {
+        // if (!empty($this->globalSearch)) {
+        //     $this->applyGlobalSearch($this->globalSearch);
+        // }
 
         // sort
-        if (!empty($this->orderBy) && !empty($this->orderDirection)) {
-            self::$sortOrderBy = $this->orderBy;
-            self::$sortOrderDirection = $this->orderDirection;
+        if (!$orderBy->isEmpty()) {
+            self::$sortOrderBy = $orderBy->getField();
+            self::$sortOrderDirection = $orderBy->getDirection();
             usort($this->data, 'self::sortResults');
         }
-        */
 
         if ($offset > 0 || $limit > 0) {
             return array_slice($this->data, $offset, $limit);
@@ -95,7 +100,7 @@ class ArrayDriver implements QueryDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function getTotalResults(OrderBy $orderBy, SearchFilter $searchFilter)
+    public function getTotalResults(OrderBy $orderBy, FilterManager $filterManager)
     {
         return count($this->data);
     }
@@ -114,13 +119,13 @@ class ArrayDriver implements QueryDriverInterface
                     $field = print_r($field, true);
                 }
 
-                if (stripos($field, $searchString) !== false) {
+                if (false !== stripos($field, $searchString)) {
                     $found = true;
                     break;
                 }
             }
 
-            if (!$found) {
+            if (false === $found) {
                 unset($this->data[$k]);
             }
         }
@@ -133,10 +138,10 @@ class ArrayDriver implements QueryDriverInterface
      */
     protected static function sortResults($a, $b)
     {
-        $a = strtolower($a[self::$sortOrderBy]);
-        $b = strtolower($b[self::$sortOrderDirection]);
+        $a = $a[self::$sortOrderBy];
+        $b = $b[self::$sortOrderBy];
 
-        if (self::$_orderDirection == 'asc') {
+        if ('asc' === self::$sortOrderDirection) {
             return ($a < $b) ? -1 : 1;
         } else {
             return ($a > $b) ? -1 : 1;

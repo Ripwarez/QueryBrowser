@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace QueryBrowser;
 
-use QueryBrowser\Exception\ViewNotFoundException;
-use QueryBrowser\OrderBy;
-use QueryBrowser\Result\Column;
 use QueryBrowser\Exception\InvalidArgumentException;
+use QueryBrowser\Exception\ViewNotFoundException;
+use QueryBrowser\Result\Column;
+use QueryBrowser\Result\View;
 
 /**
  * class Result
@@ -71,7 +71,7 @@ class Result
                 $column = new Column($name, $i);
 
                 /*
-                if ($name === $driver->getOrderBy()) {
+                if ($name === $qb->getOrderBy()) {
                     $column->setOrderDirection($driver->getOrderDirection());
                 }
                 */
@@ -93,10 +93,10 @@ class Result
     public function render(array $config = [], string $file = '')
     {
         if ($file == '') {
-            $file = dirname(__FILE__) . '/Resources/views/qbr.php';
+            $file = dirname(__FILE__) . '/Result/Resources/views/qbr.php';
         }
 
-        if (false === file_exists($file)) {
+        if (!file_exists($file)) {
             throw new ViewNotFoundException(sprintf('Unable to find file %s.', $file));
         }
 
@@ -119,8 +119,8 @@ class Result
             'id'              => $this->qb->getId(),
             'results'         => $this->results,
             'columns'         => $this->columns,
-            //'orderBy'         => $this->orderBy,
-            //'orderDirection'  => $this->orderDirection,
+            'orderBy'         => $this->qb->getOrderBy()->getField(),
+            'orderDirection'  => $this->qb->getOrderBy()->getDirection(),
             //'globalSearch'    => $this->globalSearch,
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
@@ -158,7 +158,7 @@ class Result
      */
     public function callFunctionOnColumn(string $columnId, string $function)
     {
-        if (false === isset($this->columns[$columnId])) {
+        if (!isset($this->columns[$columnId])) {
             throw new InvalidArgumentException(sprintf('Unknown column: %s', $columnId));
         }
 

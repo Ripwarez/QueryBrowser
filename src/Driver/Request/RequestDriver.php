@@ -13,22 +13,20 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\StorageDriver;
-
-use QueryBrowser\StorageDriver\StorageDriverInterface;
+namespace QueryBrowser\Driver\Request;
 
 /**
- * StorageDriver for PHP superglobal $_COOKIE.
+ * RequestDriver for PHP superglobal $_REQUEST.
  */
-class CookieDriver implements StorageDriverInterface
+class RequestDriver implements RequestDriverInterface
 {
     /**
      * {@inheritDoc}
      */
     public function get(string $key)
     {
-        if (isset($_COOKIE[$key])) {
-            return $_COOKIE[$key];
+        if (isset($_REQUEST[$key])) {
+            return $_REQUEST[$key];
         }
 
         return null;
@@ -37,8 +35,16 @@ class CookieDriver implements StorageDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function set(string $key, string $value)
+    public function getAll()
     {
-        return setcookie($key, $value);
+        return $_REQUEST;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function set(string $key, $value)
+    {
+        $_REQUEST[$key] = $value;
     }
 }

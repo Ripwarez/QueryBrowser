@@ -14,17 +14,20 @@ declare(strict_types=1);
 namespace QueryBrowser;
 
 use QueryBrowser\Exception\InvalidIdentifierException;
-use QueryBrowser\OrderBy;
-use QueryBrowser\QueryDriver\QueryDriverInterface;
-use QueryBrowser\RequestDriver\RequestDriverInterface;
-use QueryBrowser\StorageDriver\StorageDriverInterface;
-use QueryBrowser\SearchFilter;
+use QueryBrowser\Driver\Query\QueryDriverInterface;
+use QueryBrowser\Driver\Request\RequestDriverInterface;
+use QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * QueryBrowser
  */
 class QueryBrowser implements \Serializable
 {
+    /**
+     * Prefix for request variables.
+     */
+    const QB_PREFIX = 'qb';
+
     /**
      * Unique ID
      *
@@ -33,21 +36,21 @@ class QueryBrowser implements \Serializable
     protected $id;
 
     /**
-     *
+     * QueryDriver
      *
      * @var QueryDriverInterface
      */
     protected $queryDriver;
 
     /**
-     *
+     * RequestDriver
      *
      * @var RequestDriverInterface
      */
     protected $requestDriver;
 
     /**
-     *
+     * StorageDriver
      *
      * @var StorageDriverInterface
      */
@@ -79,9 +82,9 @@ class QueryBrowser implements \Serializable
     /**
      * @TODO
      *
-     * @var SearchFilter
+     * @var FilterManager
      */
-    protected $searchFilter;
+    protected $filterManager;
 
     /**
      * Constructor
@@ -98,8 +101,7 @@ class QueryBrowser implements \Serializable
         QueryDriverInterface $queryDriver,
         RequestDriverInterface $requestDriver,
         StorageDriverInterface $storageDriver
-    )
-    {
+    ) {
         if ('' === $id) {
             throw new InvalidIdentifierException('Identifier can not be empty.');
         }
@@ -111,14 +113,14 @@ class QueryBrowser implements \Serializable
         }
 
         // always prefix the id
-        $this->id = 'qb_' . $id;
+        $this->id = self::QB_PREFIX.$id;
 
         $this->queryDriver = $queryDriver;
         $this->requestDriver = $requestDriver;
         $this->storageDriver = $storageDriver;
 
         $this->orderBy = new OrderBy();
-        $this->searchFilter = new SearchFilter();
+        $this->filterManager = new FilterManager();
     }
 
     /**
@@ -157,12 +159,16 @@ class QueryBrowser implements \Serializable
      * @param int $page
      *
      * @return self
+     *
+     * @throws InvalidIdentifierException When $page is lower than 1
      */
     public function setPage(int $page)
     {
-        if ($page > 0) {
-            $this->page = $page;
+        if ($page < 1) {
+            throw new InvalidIdentifierException;
         }
+
+        $this->page = $page;
 
         return $this;
     }
@@ -180,17 +186,33 @@ class QueryBrowser implements \Serializable
     /**
      * Set pagesize
      *
+     * Set pagesize to zero to show all the results.
+     *
      * @param int $pageSize
      *
      * @return self
+     *
+     * @throws InvalidIdentifierException When $pageSize is lower than 0
      */
     public function setPageSize(int $pageSize)
     {
-        if ($pageSize >= 0) {
-            $this->pageSize = $pageSize;
+        if ($pageSize < 0) {
+            throw new InvalidIdentifierException;
         }
 
+        $this->pageSize = $pageSize;
+
         return $this;
+    }
+
+    /**
+     * Get order by
+     *
+     * @return OrderBy
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
     }
 
     /**
@@ -206,21 +228,27 @@ class QueryBrowser implements \Serializable
         // get state from request
         $this->getStateFromRequest();
 
+        // if no order by was manually set then try to get it
+        // from the source/querydriver
+        if ($this->orderBy->isEmpty()) {
+            $this->orderBy = $this->queryDriver->getOrderBy();
+        }
+
         // get the results from the driver
         $results = $this->queryDriver->getResults(
             $this->orderBy,
-            $this->searchFilter,
+            $this->filterManager,
             $this->getOffset(),
             $this->pageSize
         );
 
         // get total number if results from the driver
-        $totalResults = $this->queryDriver->getTotalResults($this->orderBy, $this->searchFilter);
+        $totalResults = $this->queryDriver->getTotalResults($this->orderBy, $this->filterManager);
 
         // somehow we have a page that is out of reach
         if (count($results) === 0 && $totalResults > 0 && $this->page > 1) {
-            $this->requestDriver->set('qbId', $this->id);
-            $this->requestDriver->set('qbPage', 1);
+            $this->requestDriver->set('qb[id]', $this->id);
+            $this->requestDriver->set('qb[page]', 1);
 
             return $this->execute();
         }
@@ -251,11 +279,11 @@ class QueryBrowser implements \Serializable
     public function serialize()
     {
         return serialize([
-            'id'           => $this->id,
-            'page'         => $this->page,
-            'pageSize'     => $this->pageSize,
-            'orderBy'      => $this->orderBy,
-            'searchFilter' => $this->searchFilter,
+            'id'            => $this->id,
+            'page'          => $this->page,
+            'pageSize'      => $this->pageSize,
+            'orderBy'       => $this->orderBy->toArray(),
+            'filterManager' => serialize($this->filterManager),
         ]);
     }
 
@@ -270,9 +298,7 @@ class QueryBrowser implements \Serializable
     {
         $data = unserialize($data);
 
-        if (is_array($data)) {
-            $this->loadStateFromArray($data);
-        }
+        $this->loadStateFromArray($data);
     }
 
     /**
@@ -286,22 +312,25 @@ class QueryBrowser implements \Serializable
     {
         if (isset($data['id']) && $data['id'] === $this->id) {
             if (isset($data['page'])) {
-                $this->setPage($data['page']);
+                $this->setPage((int) $data['page']);
             }
 
             if (isset($data['pageSize'])) {
-                $this->setPageSize($data['pageSize']);
+                $this->setPageSize((int) $data['pageSize']);
             }
 
             /*
             if (isset($data['globalSearch'])) {
                 $this->setGlobalSearch($data['globalSearch']);
             }
+            */
 
             if (isset($data['orderBy'])) {
-                $this->setOrderBy($data['orderBy']);
+                $this->orderBy = new OrderBy(
+                    $data['orderBy']['field'],
+                    $data['orderBy']['direction']
+                );
             }
-            */
         }
     }
 
@@ -315,7 +344,7 @@ class QueryBrowser implements \Serializable
         $data = $this->storageDriver->get($this->id);
 
         if (null !== $data) {
-            $this->unserialize($data);
+            unserialize($data);
         }
     }
 
@@ -328,8 +357,8 @@ class QueryBrowser implements \Serializable
     {
         $data = $this->requestDriver->getAll($this->id);
 
-        if (null !== $data) {
-            $this->loadStateFromArray($data);
+        if (null !== $data && isset($data[self::QB_PREFIX])) {
+            $this->loadStateFromArray($data[self::QB_PREFIX]);
         }
     }
 
@@ -340,7 +369,6 @@ class QueryBrowser implements \Serializable
      */
     protected function saveStateToStorage()
     {
-        return $this->storageDriver->set($this->id, $this->serialize());
+        return $this->storageDriver->set($this->id, serialize($this));
     }
-
 }

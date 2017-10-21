@@ -13,10 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\StorageDriver;
+namespace QueryBrowser\Driver\Storage;
 
 /**
  * Interface implemented by QueryBrowser\StorageDriver classes.
+ *
+ * The storage driver handles persisting the last known state of a QueryBrowser instance.
  */
 interface StorageDriverInterface
 {
@@ -27,7 +29,7 @@ interface StorageDriverInterface
      *
      * @return string|null
      */
-	public function get(string $key);
+    public function get(string $key);
 
     /**
      * .

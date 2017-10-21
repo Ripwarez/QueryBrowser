@@ -13,11 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\Exception;
+namespace QueryBrowser;
 
 /**
- * ViewNotFoundException is thrown when a view cannot be found.
+ *
  */
-class ViewNotFoundException extends Exception
+class FilterManager
 {
+
 }

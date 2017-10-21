@@ -16,11 +16,11 @@ declare(strict_types=1);
 namespace QueryBrowser;
 
 use QueryBrowser\Exception\DriverNotFoundException;
-use QueryBrowser\QueryDriver\ArrayDriver;
-use QueryBrowser\RequestDriver\RequestDriverInterface;
-use QueryBrowser\StorageDriver\StorageDriverInterface;
-use QueryBrowser\RequestDriver\SuperGlobalDriver;
-use QueryBrowser\StorageDriver\CookieDriver;
+use QueryBrowser\Driver\Query\ArrayQueryDriver;
+use QueryBrowser\Driver\Request\RequestDriverInterface;
+use QueryBrowser\Driver\Request\RequestDriver;
+use QueryBrowser\Driver\Storage\CookieStorageDriver;
+use QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * Factory for creating a new QueryBrowser.
@@ -28,12 +28,12 @@ use QueryBrowser\StorageDriver\CookieDriver;
 class Factory
 {
     /**
-     * List of possible drivers.
+     * List of possible query drivers.
      *
      * @var array
      */
-    private static $driversList = [
-        'array' => ArrayDriver::class,
+    private static $queryDriversList = [
+        'array' => ArrayQueryDriver::class,
     ];
 
     /**
@@ -58,13 +58,13 @@ class Factory
 
         switch (gettype($sourceObject)) {
             case 'array':
-                $queryDriverClass = self::$driversList['array'];
+                $queryDriverClass = self::$queryDriversList['array'];
                 break;
 
             case 'object':
                 $class = getclass($sourceObject);
-                if (isset(self::$driversList[$class])) {
-                    $queryDriverClass = self::$driversList[$class];
+                if (isset(self::$queryDriversList[$class])) {
+                    $queryDriverClass = self::$queryDriversList[$class];
                 }
                 break;
         }
@@ -82,11 +82,11 @@ class Factory
         }
 
         if (null === $requestDriver) {
-            $requestDriver = new SuperGlobalDriver();
+            $requestDriver = new RequestDriver();
         }
 
         if (null === $storageDriver) {
-            $storageDriver = new CookieDriver();
+            $storageDriver = new CookieStorageDriver();
         }
 
         return new QueryBrowser($id, $queryDriver, $requestDriver, $storageDriver);

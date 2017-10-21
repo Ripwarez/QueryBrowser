@@ -15,8 +15,6 @@ declare(strict_types=1);
 
 namespace QueryBrowser\Exception;
 
-use QueryBrowser\Exception\Exception;
-
 /**
  * DriverNotFoundException is thrown when a driver cannot be determined.
  */

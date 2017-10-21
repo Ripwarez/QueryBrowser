@@ -15,8 +15,6 @@ declare(strict_types=1);
 
 namespace QueryBrowser\Exception;
 
-use QueryBrowser\Exception\Exception;
-
 /**
  * InvalidArgumentException is thrown when an invalid argument is supplied.
  */

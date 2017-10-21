@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use QueryBrowser\QueryBrowser;
-use QueryBrowser\QueryDriver\ArrayDriver;
-use QueryBrowser\RequestDriver\SuperGlobalDriver;
-use QueryBrowser\StorageDriver\NullDriver;
+use QueryBrowser\Driver\Query\ArrayQueryDriver;
+use QueryBrowser\Driver\Request\RequestDriver;
+use QueryBrowser\Driver\Storage\NullStorageDriver;
 
 /**
  * @covers QueryBrowser
@@ -29,9 +29,9 @@ class QueryBrowserTest extends TestCase
      */
     public function testInvalidIdentifierException($id)
     {
-        $arrayDriver = $this->createMock(ArrayDriver::class);
-        $requestDriver = $this->createMock(SuperGlobalDriver::class);
-        $storageDriver = $this->createMock(NullDriver::class);
+        $arrayDriver = $this->createMock(ArrayQueryDriver::class);
+        $requestDriver = $this->createMock(RequestDriver::class);
+        $storageDriver = $this->createMock(NullStorageDriver::class);
 
         new QueryBrowser($id, $arrayDriver, $requestDriver, $storageDriver);
     }

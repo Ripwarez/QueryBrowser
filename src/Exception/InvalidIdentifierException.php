@@ -15,8 +15,6 @@ declare(strict_types=1);
 
 namespace QueryBrowser\Exception;
 
-use QueryBrowser\Exception\Exception;
-
 /**
  * InvalidIdentifierException is thrown when the identifier is empty or invalid.
  */

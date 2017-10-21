@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace QueryBrowser\Result;
 
 /**
  *
@@ -32,10 +32,10 @@ trait ViewTrait
         preg_match_all('#<([a-zA-Z0-9_]++)>#', $uri, $matches);
 
         if (isset($matches[1])) {
-            foreach ($matches[1] as $i => $columnKey) {
+            foreach ($matches[1] as $i => $columnId) {
                 // get the column value
-                if (isset($result[$columnKey])) {
-                    $uri = str_replace($matches[0][$i], $result[$columnKey], $uri);
+                if (isset($result[$columnId])) {
+                    $uri = str_replace($matches[0][$i], $result[$columnId], $uri);
                 }
             }
         }
@@ -50,12 +50,17 @@ trait ViewTrait
      *
      * @return string
      */
-    public function highlightString(srting $needle, string $haystack)
+    public function highlightString(string $needle, string $haystack, string $class = 'highlight')
     {
-        if (substr($haystack, 0, 1) != '<') {
-            return preg_replace(sprintf('/(%s)/i', str_replace('/', '\/', $needle)), '<span class="highlight">\\1</span>', $haystack);
+        // skip if the value is HTML
+        if ('<' === substr($haystack, 0, 1)) {
+            return $haystack;
         }
 
-        return $haystack;
+        // escape backslashes
+        $needle = str_replace('/', '\/', $needle);
+
+        // replace all occurences
+        return preg_replace('/('.$needle.')/i', '<span class="'.$class.'">\\1</span>', $haystack);
     }
 }

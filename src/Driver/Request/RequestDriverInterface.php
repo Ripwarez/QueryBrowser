@@ -13,10 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\RequestDriver;
+namespace QueryBrowser\Driver\Request;
 
 /**
  * Interface implemented by QueryBrowser\RequestDriver classes.
+ *
+ * The request driver handles getting & setting values from the Request.
  */
 interface RequestDriverInterface
 {

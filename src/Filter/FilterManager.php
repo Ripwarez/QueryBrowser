@@ -13,12 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace QueryBrowser\Filter;
 
 /**
  *
  */
-class SearchFilter
+class FilterManager
 {
-
+    =
 }

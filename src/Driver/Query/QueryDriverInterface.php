@@ -13,13 +13,16 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\QueryDriver;
+namespace QueryBrowser\Driver\Query;
 
 use QueryBrowser\OrderBy;
-use QueryBrowser\SearchFilter;
+use QueryBrowser\FilterManager;
 
 /**
  * Interface implemented by QueryBrowser\QueryDriver classes.
+ *
+ * The query driver handles fetching the results from the source based
+ * on the supplied state.
  */
 interface QueryDriverInterface
 {
@@ -33,16 +36,23 @@ interface QueryDriverInterface
     public function generateId();
 
     /**
+     * Get the last order by.
+     *
+     * @return OrderBy
+     */
+    public function getOrderBy();
+
+    /**
      * Get the results from the source/query.
      *
      * @return array Associative array having the column names as array keys.
      */
-    public function getResults(OrderBy $orderBy, SearchFilter $searchFilter, int $offset, int $limit);
+    public function getResults(OrderBy $orderBy, FilterManager $filterManager, int $offset, int $limit);
 
     /**
      * Get the number of total available results.
      *
      * @return int
      */
-    public function getTotalResults(OrderBy $orderBy, SearchFilter $searchFilter);
+    public function getTotalResults(OrderBy $orderBy, FilterManager $filterManager);
 }

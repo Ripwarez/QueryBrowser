@@ -13,14 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\StorageDriver;
-
-use QueryBrowser\StorageDriver\StorageDriverInterface;
+namespace QueryBrowser\Driver\Storage;
 
 /**
  * StorageDriver for null (used for testing).
  */
-class NullDriver implements StorageDriverInterface
+class NullStorageDriver implements StorageDriverInterface
 {
     /**
      * {@inheritDoc}

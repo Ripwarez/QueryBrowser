@@ -146,6 +146,10 @@ class Column
     /**
      * Set sequence
      *
+     * The columns from the result are multiplied by a factor of 100 so it's
+     * easier to add column between them. So the first column has sequence 0 and
+     * the second 200, third 300, etc.
+     *
      * @param int $sequence
      *
      * @return self
@@ -226,7 +230,7 @@ class Column
      */
     public function setTextAlign(string $textAlign)
     {
-        if (false === in_array($textAlign, ['left', 'center', 'right'])) {
+        if (!in_array($textAlign, ['left', 'center', 'right'])) {
             throw new InvalidArgumentException("The value must be 'left', 'center' or 'right'.");
         }
 
@@ -256,8 +260,8 @@ class Column
      */
     public function setOrderDirection(string $orderDirection)
     {
-        if (false === in_array($orderDirection, [null, 'asc', 'desc'])) {
-            throw new InvalidArgumentException("The value must be null, 'asc' or 'desc'.");
+        if (!in_array($orderDirection, ['', 'asc', 'desc'])) {
+            throw new InvalidArgumentException("The value must be '', 'asc' or 'desc'.");
         }
 
         $this->orderDirection = $orderDirection;

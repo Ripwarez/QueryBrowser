@@ -11,9 +11,7 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
-
-use QueryBrowser\ViewTrait;
+namespace QueryBrowser\Result;
 
 /**
  * class View
