@@ -3,7 +3,7 @@
 /**
  * QueryBrowser
  *
- * @link      https://gitlab.kapma.nl/paulhekkema/querybrowser
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
  * @license   MIT (see LICENSE for details)
  * @author    Paul Hekkema <paul@hekkema.nl>
  *
@@ -13,11 +13,11 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\Driver\Query;
+namespace PaulHekkema\QueryBrowser\Driver\Query;
 
-use QueryBrowser\OrderBy;
-use QueryBrowser\SearchManager;
-use QueryBrowser\Search;
+use PaulHekkema\QueryBrowser\OrderBy;
+use PaulHekkema\QueryBrowser\SearchManager;
+use PaulHekkema\QueryBrowser\Search;
 
 /**
  * QueryDriver for an array.

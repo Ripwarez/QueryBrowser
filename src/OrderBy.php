@@ -3,7 +3,7 @@
 /**
  * QueryBrowser
  *
- * @link      https://gitlab.kapma.nl/paulhekkema/querybrowser
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
  * @license   MIT (see LICENSE for details)
  * @author    Paul Hekkema <paul@hekkema.nl>
  *
@@ -13,9 +13,9 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace PaulHekkema\QueryBrowser;
 
-use QueryBrowser\Exception\InvalidArgumentException;
+use PaulHekkema\QueryBrowser\Exception\InvalidArgumentException;
 
 /**
  * The last order by from the source or the order by manually set by the user.

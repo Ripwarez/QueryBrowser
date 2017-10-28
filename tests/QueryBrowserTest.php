@@ -12,10 +12,10 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use QueryBrowser\QueryBrowser;
-use QueryBrowser\Driver\Query\ArrayQueryDriver;
-use QueryBrowser\Driver\Request\RequestDriver;
-use QueryBrowser\Driver\Storage\NullStorageDriver;
+use PaulHekkema\QueryBrowser\QueryBrowser;
+use PaulHekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
+use PaulHekkema\QueryBrowser\Driver\Request\RequestDriver;
+use PaulHekkema\QueryBrowser\Driver\Storage\NullStorageDriver;
 
 /**
  * @covers QueryBrowser
@@ -23,7 +23,7 @@ use QueryBrowser\Driver\Storage\NullStorageDriver;
 class QueryBrowserTest extends TestCase
 {
     /**
-     * @expectedException QueryBrowser\Exception\InvalidIdentifierException
+     * @expectedException PaulHekkema\QueryBrowser\Exception\InvalidIdentifierException
      *
      * @dataProvider idProvider
      */

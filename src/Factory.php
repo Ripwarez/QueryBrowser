@@ -3,7 +3,7 @@
 /**
  * QueryBrowser
  *
- * @link      https://gitlab.kapma.nl/paulhekkema/querybrowser
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
  * @license   MIT (see LICENSE for details)
  * @author    Paul Hekkema <paul@hekkema.nl>
  *
@@ -13,14 +13,14 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace PaulHekkema\QueryBrowser;
 
-use QueryBrowser\Exception\DriverNotFoundException;
-use QueryBrowser\Driver\Query\ArrayQueryDriver;
-use QueryBrowser\Driver\Request\RequestDriverInterface;
-use QueryBrowser\Driver\Request\RequestDriver;
-use QueryBrowser\Driver\Storage\CookieStorageDriver;
-use QueryBrowser\Driver\Storage\StorageDriverInterface;
+use PaulHekkema\QueryBrowser\Exception\DriverNotFoundException;
+use PaulHekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
+use PaulHekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
+use PaulHekkema\QueryBrowser\Driver\Request\RequestDriver;
+use PaulHekkema\QueryBrowser\Driver\Storage\CookieStorageDriver;
+use PaulHekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * Factory for creating a new QueryBrowser.

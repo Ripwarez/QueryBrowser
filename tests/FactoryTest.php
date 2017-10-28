@@ -12,8 +12,8 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use QueryBrowser\Factory;
-use QueryBrowser\QueryBrowser;
+use PaulHekkema\QueryBrowser\Factory;
+use PaulHekkema\QueryBrowser\QueryBrowser;
 
 /**
  * @covers Factory
@@ -29,7 +29,7 @@ class FactoryTest extends TestCase
     }
 
     /**
-     * @expectedException QueryBrowser\Exception\DriverNotFoundException
+     * @expectedException PaulHekkema\QueryBrowser\Exception\DriverNotFoundException
      */
     public function testDriverNotFoundException()
     {

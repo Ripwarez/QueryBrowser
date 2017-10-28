@@ -1,22 +1,23 @@
 <?php
 
-/*
- * This file is part of the QueryBrowser package.
+/**
+ * QueryBrowser
  *
- * (c) Paul Hekkema <paul@hekkema.nl>
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
+ * @license   MIT (see LICENSE for details)
+ * @author    Paul Hekkema <paul@hekkema.nl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace PaulHekkema\QueryBrowser;
 
-use QueryBrowser\Exception\InvalidIdentifierException;
-use QueryBrowser\Driver\Query\QueryDriverInterface;
-use QueryBrowser\Driver\Request\RequestDriverInterface;
-use QueryBrowser\Driver\Storage\StorageDriverInterface;
+use PaulHekkema\QueryBrowser\Exception\InvalidIdentifierException;
+use PaulHekkema\QueryBrowser\Driver\Query\QueryDriverInterface;
+use PaulHekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
+use PaulHekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * QueryBrowser

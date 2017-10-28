@@ -1,9 +1,11 @@
 <?php
 
-/*
- * This file is part of the QueryBrowser package.
+/**
+ * QueryBrowser
  *
- * (c) Paul Hekkema <paul@hekkema.nl>
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
+ * @license   MIT (see LICENSE for details)
+ * @author    Paul Hekkema <paul@hekkema.nl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,12 +13,12 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser;
+namespace PaulHekkema\QueryBrowser;
 
-use QueryBrowser\Exception\InvalidArgumentException;
-use QueryBrowser\Exception\ViewNotFoundException;
-use QueryBrowser\Result\Column;
-use QueryBrowser\Result\View;
+use PaulHekkema\QueryBrowser\Exception\InvalidArgumentException;
+use PaulHekkema\QueryBrowser\Exception\ViewNotFoundException;
+use PaulHekkema\QueryBrowser\Result\Column;
+use PaulHekkema\QueryBrowser\Result\View;
 
 /**
  * class Result

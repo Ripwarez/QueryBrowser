@@ -3,7 +3,7 @@
 /**
  * QueryBrowser
  *
- * @link      https://gitlab.kapma.nl/paulhekkema/querybrowser
+ * @link      https://gitlab.kapma.nl/paulhekkema/QueryBrowser
  * @license   MIT (see LICENSE for details)
  * @author    Paul Hekkema <paul@hekkema.nl>
  *
@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace QueryBrowser\Driver\Request;
+namespace PaulHekkema\QueryBrowser\Driver\Request;
 
 /**
  * RequestDriver for PHP superglobal $_REQUEST.

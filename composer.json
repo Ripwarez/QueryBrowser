@@ -1,7 +1,7 @@
 {
-    "name": "querybrowser/querybrowser",
+    "name": "paulhekkema/querybrowser",
     "description": "QueryBrowser",
-    "keywords": ["query", "browser"],
+    "keywords": ["querybrowser", "datatables"],
     "homepage": "http://github.com/paulhekkema/QueryBrowser",
     "type": "library",
     "license": "MIT",
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-        	"QueryBrowser\\": "src"
+        	"PaulHekkema\\QueryBrowser\\": "src"
         }
     }
 }
