@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Driver\Request;
+namespace Hekkema\QueryBrowser\Driver\Request;
 
 /**
  * Interface implemented by QueryBrowser\RequestDriver classes.

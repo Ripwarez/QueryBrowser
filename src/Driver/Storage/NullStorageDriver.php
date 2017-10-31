@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Driver\Storage;
+namespace Hekkema\QueryBrowser\Driver\Storage;
 
 /**
  * StorageDriver for null (used for testing).

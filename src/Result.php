@@ -13,12 +13,12 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser;
+namespace Hekkema\QueryBrowser;
 
-use PaulHekkema\QueryBrowser\Exception\InvalidArgumentException;
-use PaulHekkema\QueryBrowser\Exception\ViewNotFoundException;
-use PaulHekkema\QueryBrowser\Result\Column;
-use PaulHekkema\QueryBrowser\Result\View;
+use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
+use Hekkema\QueryBrowser\Exception\ViewNotFoundException;
+use Hekkema\QueryBrowser\Result\Column;
+use Hekkema\QueryBrowser\Result\View;
 
 /**
  * class Result

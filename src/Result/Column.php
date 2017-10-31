@@ -12,9 +12,9 @@
  */
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Result;
+namespace Hekkema\QueryBrowser\Result;
 
-use PaulHekkema\QueryBrowser\Exception\InvalidArgumentException;
+use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
 
 /**
  * Column

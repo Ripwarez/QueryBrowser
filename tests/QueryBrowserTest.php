@@ -12,10 +12,10 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use PaulHekkema\QueryBrowser\QueryBrowser;
-use PaulHekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
-use PaulHekkema\QueryBrowser\Driver\Request\RequestDriver;
-use PaulHekkema\QueryBrowser\Driver\Storage\NullStorageDriver;
+use Hekkema\QueryBrowser\QueryBrowser;
+use Hekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
+use Hekkema\QueryBrowser\Driver\Request\RequestDriver;
+use Hekkema\QueryBrowser\Driver\Storage\NullStorageDriver;
 
 /**
  * @covers QueryBrowser
@@ -23,7 +23,7 @@ use PaulHekkema\QueryBrowser\Driver\Storage\NullStorageDriver;
 class QueryBrowserTest extends TestCase
 {
     /**
-     * @expectedException PaulHekkema\QueryBrowser\Exception\InvalidIdentifierException
+     * @expectedException Hekkema\QueryBrowser\Exception\InvalidIdentifierException
      *
      * @dataProvider idProvider
      */
@@ -33,7 +33,7 @@ class QueryBrowserTest extends TestCase
         $requestDriver = $this->createMock(RequestDriver::class);
         $storageDriver = $this->createMock(NullStorageDriver::class);
 
-        new QueryBrowser($id, $arrayDriver, $requestDriver, $storageDriver);
+        new QueryBrowser($arrayDriver, $requestDriver, $storageDriver, $id);
     }
 
     public function idProvider()

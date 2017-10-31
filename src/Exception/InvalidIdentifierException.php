@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Exception;
+namespace Hekkema\QueryBrowser\Exception;
 
 /**
  * InvalidIdentifierException is thrown when the identifier is empty or invalid.

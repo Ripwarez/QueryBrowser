@@ -13,14 +13,14 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser;
+namespace Hekkema\QueryBrowser;
 
-use PaulHekkema\QueryBrowser\Exception\DriverNotFoundException;
-use PaulHekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
-use PaulHekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
-use PaulHekkema\QueryBrowser\Driver\Request\RequestDriver;
-use PaulHekkema\QueryBrowser\Driver\Storage\CookieStorageDriver;
-use PaulHekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
+use Hekkema\QueryBrowser\Exception\DriverNotFoundException;
+use Hekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
+use Hekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
+use Hekkema\QueryBrowser\Driver\Request\RequestDriver;
+use Hekkema\QueryBrowser\Driver\Storage\CookieStorageDriver;
+use Hekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * Factory for creating a new QueryBrowser.
@@ -52,7 +52,7 @@ class Factory
         $sourceObject,
         RequestDriverInterface $requestDriver = null,
         StorageDriverInterface $storageDriver = null,
-        string $id = null
+        array $config = []
     ) {
         $queryDriverClass = '';
 
@@ -76,11 +76,6 @@ class Factory
         // create the querydriver
         $queryDriver = new $queryDriverClass($sourceObject);
 
-        // if no id is supplied, use the one from the driver
-        if (null === $id) {
-            $id = $queryDriver->generateId();
-        }
-
         if (null === $requestDriver) {
             $requestDriver = new RequestDriver();
         }
@@ -89,6 +84,6 @@ class Factory
             $storageDriver = new CookieStorageDriver();
         }
 
-        return new QueryBrowser($id, $queryDriver, $requestDriver, $storageDriver);
+        return new QueryBrowser($queryDriver, $requestDriver, $storageDriver, $config);
     }
 }

@@ -13,10 +13,10 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Driver\Query;
+namespace Hekkema\QueryBrowser\Driver\Query;
 
-use PaulHekkema\QueryBrowser\OrderBy;
-use PaulHekkema\QueryBrowser\SearchManager;
+use Hekkema\QueryBrowser\OrderBy;
+use Hekkema\QueryBrowser\SearchManager;
 
 /**
  * Interface implemented by QueryBrowser\QueryDriver classes.

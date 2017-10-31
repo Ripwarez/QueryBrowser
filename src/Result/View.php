@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Result;
+namespace Hekkema\QueryBrowser\Result;
 
 /**
  * class View

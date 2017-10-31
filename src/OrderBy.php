@@ -13,9 +13,9 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser;
+namespace Hekkema\QueryBrowser;
 
-use PaulHekkema\QueryBrowser\Exception\InvalidArgumentException;
+use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
 
 /**
  * The last order by from the source or the order by manually set by the user.

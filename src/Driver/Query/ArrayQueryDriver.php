@@ -13,11 +13,11 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Driver\Query;
+namespace Hekkema\QueryBrowser\Driver\Query;
 
-use PaulHekkema\QueryBrowser\OrderBy;
-use PaulHekkema\QueryBrowser\SearchManager;
-use PaulHekkema\QueryBrowser\Search;
+use Hekkema\QueryBrowser\OrderBy;
+use Hekkema\QueryBrowser\SearchManager;
+use Hekkema\QueryBrowser\Search;
 
 /**
  * QueryDriver for an array.

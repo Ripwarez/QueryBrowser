@@ -13,11 +13,12 @@
 
 declare(strict_types=1);
 
-namespace Hekkema\QueryBrowser\Exception;
+namespace Hekkema\QueryBrowser;
 
 /**
- * ViewNotFoundException is thrown when a view cannot be found.
+ *
  */
-class ViewNotFoundException extends Exception
+class ConfigManager
 {
+
 }

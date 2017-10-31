@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser\Exception;
+namespace Hekkema\QueryBrowser\Exception;
 
 /**
  * DriverNotFoundException is thrown when a driver cannot be determined.

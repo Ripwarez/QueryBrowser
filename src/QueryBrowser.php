@@ -12,12 +12,12 @@
  */
 declare(strict_types=1);
 
-namespace PaulHekkema\QueryBrowser;
+namespace Hekkema\QueryBrowser;
 
-use PaulHekkema\QueryBrowser\Exception\InvalidIdentifierException;
-use PaulHekkema\QueryBrowser\Driver\Query\QueryDriverInterface;
-use PaulHekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
-use PaulHekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
+use Hekkema\QueryBrowser\Exception\InvalidIdentifierException;
+use Hekkema\QueryBrowser\Driver\Query\QueryDriverInterface;
+use Hekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
+use Hekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * QueryBrowser
@@ -35,6 +35,13 @@ class QueryBrowser implements \Serializable
      * @var string
      */
     protected $id;
+
+    /**
+     * Configuration
+     *
+     * @var array
+     */
+    protected $config;
 
     /**
      * QueryDriver
@@ -98,11 +105,16 @@ class QueryBrowser implements \Serializable
      * @throws InvalidIdentifierException When id is empty or invalid
      */
     public function __construct(
-        string $id,
         QueryDriverInterface $queryDriver,
         RequestDriverInterface $requestDriver,
-        StorageDriverInterface $storageDriver
+        StorageDriverInterface $storageDriver,
+        array $config = []
     ) {
+        // if no id is supplied, use the one from the driver
+        if ('' === $id) {
+            $id = $queryDriver->generateId();
+        }
+
         if ('' === $id) {
             throw new InvalidIdentifierException('Identifier can not be empty.');
         }
@@ -112,6 +124,8 @@ class QueryBrowser implements \Serializable
                 sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
             );
         }
+
+        $this->config = $config;
 
         // always prefix the id
         $this->id = self::QB_PREFIX.$id;
