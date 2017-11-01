@@ -2,8 +2,8 @@
 
 # QueryBrowser
 
-QueryBrowser is a DataTables alternative primarily aimed at CMS-systems but it can be used wherever you like. The biggest
-difference is that QueryBrowser only works server-side and the integration is a lot simpler.
+QueryBrowser is an DataTables alternative primarily aimed at CMS-systems but it can be used wherever you like. The biggest
+difference is that QueryBrowser only works server-side and the integration is easier.
 
 ## Requirements
 

@@ -206,7 +206,6 @@ class Result
         $offset = $this->qb->getOffset();
         $orderBy = $this->qb->getOrderBy();
         $searchManager = $this->qb->getSearchManager();
-        $globalSearch = '';
 
         $this->sortColumns();
 
@@ -216,7 +215,7 @@ class Result
             'columns'         => $this->columns,
             'orderBy'         => $orderBy->getField(),
             'orderDirection'  => $orderBy->getDirection(),
-            'globalSearch'    => $globalSearch,
+            'globalSearch'    => $searchManager->getGlobalSearch()->getQuery(),
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
             'nrResults'       => $nrResults,
