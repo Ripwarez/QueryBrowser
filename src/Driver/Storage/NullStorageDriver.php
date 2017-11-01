@@ -21,7 +21,7 @@ namespace Hekkema\QueryBrowser\Driver\Storage;
 class NullStorageDriver implements StorageDriverInterface
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function get(string $key)
     {
@@ -29,9 +29,9 @@ class NullStorageDriver implements StorageDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function set(string $key, string $value)
+    public function set(string $key, string $value): bool
     {
         return false;
     }

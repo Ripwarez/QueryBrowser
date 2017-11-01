@@ -18,10 +18,10 @@ namespace Hekkema\QueryBrowser\Driver\Request;
 /**
  * RequestDriver for PHP superglobal $_REQUEST.
  */
-class RequestDriver implements RequestDriverInterface
+class DefaultRequestDriver implements RequestDriverInterface
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function get(string $key)
     {
@@ -33,7 +33,7 @@ class RequestDriver implements RequestDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getAll()
     {
@@ -41,10 +41,12 @@ class RequestDriver implements RequestDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value): bool
     {
         $_REQUEST[$key] = $value;
+
+        return true;
     }
 }

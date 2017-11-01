@@ -39,5 +39,5 @@ interface StorageDriverInterface
      *
      * @return bool
      */
-    public function set(string $key, string $value);
+    public function set(string $key, string $value): bool;
 }

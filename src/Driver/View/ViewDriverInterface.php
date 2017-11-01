@@ -13,11 +13,17 @@
 
 declare(strict_types=1);
 
-namespace Hekkema\QueryBrowser\Exception;
+namespace Hekkema\QueryBrowser\Driver\View;
 
 /**
- * ViewNotFoundException is thrown when a view cannot be found.
+ * Interface implemented by QueryBrowser\Driver\ViewDriver classes.
+ *
+ * The view driver handles persisting the last known state of a QueryBrowser instance.
  */
-class ViewNotFoundException extends Exception
+interface ViewDriverInterface
 {
+    /**
+     *
+     */
+    public function render(string $file, array $data): string;
 }

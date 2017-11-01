@@ -33,26 +33,26 @@ interface QueryDriverInterface
      *
      * @return string
      */
-    public function generateId();
+    public function generateId(): string;
 
     /**
      * Get the last order by.
      *
      * @return OrderBy
      */
-    public function getOrderBy();
+    public function getOrderBy(): OrderBy;
 
     /**
      * Get the results from the source/query.
      *
      * @return array Associative array having the column names as array keys.
      */
-    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit);
+    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit): array;
 
     /**
      * Get the number of total available results.
      *
      * @return int
      */
-    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager);
+    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager): int;
 }

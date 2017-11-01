@@ -17,10 +17,6 @@ namespace Hekkema\QueryBrowser;
 
 use Hekkema\QueryBrowser\Exception\DriverNotFoundException;
 use Hekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
-use Hekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
-use Hekkema\QueryBrowser\Driver\Request\RequestDriver;
-use Hekkema\QueryBrowser\Driver\Storage\CookieStorageDriver;
-use Hekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
 
 /**
  * Factory for creating a new QueryBrowser.
@@ -48,12 +44,9 @@ class Factory
      *
      * @throws DriverNotFoundException When unable to determine driver
      */
-    public static function create(
-        $sourceObject,
-        RequestDriverInterface $requestDriver = null,
-        StorageDriverInterface $storageDriver = null,
-        array $config = []
-    ) {
+    public static function create($sourceObject, array $config = []
+    )
+    {
         $queryDriverClass = '';
 
         switch (gettype($sourceObject)) {
@@ -76,14 +69,6 @@ class Factory
         // create the querydriver
         $queryDriver = new $queryDriverClass($sourceObject);
 
-        if (null === $requestDriver) {
-            $requestDriver = new RequestDriver();
-        }
-
-        if (null === $storageDriver) {
-            $storageDriver = new CookieStorageDriver();
-        }
-
-        return new QueryBrowser($queryDriver, $requestDriver, $storageDriver, $config);
+        return new QueryBrowser($queryDriver, $config);
     }
 }

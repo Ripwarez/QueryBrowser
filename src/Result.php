@@ -19,6 +19,7 @@ use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
 use Hekkema\QueryBrowser\Exception\ViewNotFoundException;
 use Hekkema\QueryBrowser\Result\Column;
 use Hekkema\QueryBrowser\Result\View;
+use Hekkema\QueryBrowser\Driver\View\ViewDriverInterface;
 
 /**
  * class Result
@@ -54,6 +55,20 @@ class Result
     protected $qb;
 
     /**
+     *
+     *
+     * @var ViewDriverInterface
+     */
+    protected $viewDriver;
+
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $template;
+
+    /**
      * Construct a new QueryBrowser\Result.
      *
      * @param array $results
@@ -67,10 +82,18 @@ class Result
         $this->totalResults = $totalResults;
         $this->qb = $qb;
 
+        $viewDriver = $qb->getConfig()->get('qbr.viewDriver');
+        $this->setViewDriver(new $viewDriver);
+
+        $template = $qb->getConfig()->get('qbr.template');
+        if ('' !== $template) {
+            $this->setTemplate($template);
+        }
+
         if (count($results) > 0) {
             $result = reset($results);
             foreach (array_keys($result) as $i => $name) {
-                $column = new Column($name, $i);
+                $column = new Column($name, $i * 100);
 
                 $orderBy = $qb->getOrderBy();
                 if ($name === $orderBy->getField()) {
@@ -83,32 +106,98 @@ class Result
     }
 
     /**
+     * Get results
+     *
+     * @return array
+     */
+    public function getResults()
+    {
+        return $this->results;
+    }
+
+    /**
+     * Get total results
+     *
+     * @return int
+     */
+    public function getTotalResults()
+    {
+        return $this->totalResults;
+    }
+
+    /**
+     * Get template
+     *
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * [getViewDriver description]
+     *
+     * @return [type] [description]
+     */
+    public function getViewDriver()
+    {
+        return $this->viewDriver;
+    }
+
+    /**
+     * [setViewDriver description]
+     *
+     * @param ViewDriverInterface $viewDriver [description]
+     */
+    public function setViewDriver(ViewDriverInterface $viewDriver)
+    {
+        $this->viewDriver = $viewDriver;
+
+        return $this;
+    }
+
+    /**
+     * Set template
+     *
+     * @param string $template
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException When template is not found
+     */
+    public function setTemplate(string $template)
+    {
+        if (!file_exists($template)) {
+            throw new InvalidArgumentException(sprintf('Unable to find file %s.', $template));
+        }
+
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
      * Renders
      *
      * @param array
      *
      * @return string  output (HTML)
-     *
-     * @throws ViewNotFoundException When view is not found
      */
-    public function render(array $config = [], string $file = '')
+    public function render(array $data = [], string $template = '')
     {
-        if ($file == '') {
-            $file = dirname(__FILE__) . '/Result/Resources/views/qbr.php';
+        if ('' !== $template) {
+            $this->setTemplate($template);
         }
 
-        if (!file_exists($file)) {
-            throw new ViewNotFoundException(sprintf('Unable to find file %s.', $file));
-        }
-
-        $config = array_merge(
+        $data = array_merge(
             [
                 'createURI' => '',
                 'updateURI' => '',
                 'sortURI'   => '',
                 'deleteURI' => '',
             ],
-            $config
+            $data
         );
 
         $totalPages = ceil($this->totalResults / $this->qb->getPageSize());
@@ -119,7 +208,9 @@ class Result
         $searchManager = $this->qb->getSearchManager();
         $globalSearch = '';
 
-        $data = [
+        $this->sortColumns();
+
+        $data = array_merge($data, [
             'id'              => $this->qb->getId(),
             'results'         => $this->results,
             'columns'         => $this->columns,
@@ -137,15 +228,13 @@ class Result
             'firstPage'       => ($page != 1) ? 1 : 0,
             'lastPage'        => ($page < $totalPages) ? $totalPages : 0,
             'pageSize'        => $this->qb->getPageSize(),
-            'pageSizeOptions' => [10, 25, 50, 100],
-            'createURI'       => $config['createURI'],
-            'updateURI'       => $config['updateURI'],
-            'deleteURI'       => $config['deleteURI']
-        ];
+            'pageSizeOptions' => $this->qb->getConfig()->get('qbr.pageSizeOptions'),
+            'createURI'       => $data['createURI'],
+            'updateURI'       => $data['updateURI'],
+            'deleteURI'       => $data['deleteURI']
+        ]);
 
-        $view = new View($file, $data);
-
-        return $view->render();
+        return $this->viewDriver->render($template, $data);
     }
 
     /**
@@ -160,10 +249,14 @@ class Result
      *
      * @return  void
      */
-    public function callFunctionOnColumn(string $columnId, string $function)
+    public function callFunctionOnColumn(string $columnId, callable $function)
     {
         if (!isset($this->columns[$columnId])) {
             throw new InvalidArgumentException(sprintf('Unknown column: %s', $columnId));
+        }
+
+        if (!is_callable($function)) {
+            throw new InvalidArgumentException(sprintf('Function not callable: %s', $function));
         }
 
         // get user arguments
@@ -189,7 +282,7 @@ class Result
     public function addColumn(string $columnId, int $sequence, string $value = null)
     {
         if (isset($this->columns[$columnId])) {
-            throw new InvalidArgumentException(sprintf('Unknown column: %s', $columnId));
+            throw new InvalidArgumentException(sprintf('Column already exists: %s', $columnId));
         }
 
         // add column
@@ -203,5 +296,24 @@ class Result
         }
 
         return $column;
+    }
+
+    /**
+     * Sort the columns by sequence ascending
+     *
+     * @return void
+     */
+    protected function sortColumns()
+    {
+        uasort($this->columns, function ($columnA, $columnB) {
+            $sequenceA = $columnA->getSequence();
+            $sequenceB = $columnB->getSequence();
+
+            if ($sequenceA === $sequenceB) {
+                return 0;
+            }
+
+            return ($sequenceA < $sequenceB) ? -1 : 1;
+        });
     }
 }

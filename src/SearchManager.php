@@ -38,16 +38,20 @@ class SearchManager
      *
      *
      * @param string $query [description]
-     * @param int    $type  [description]
+     * @param int    $operator  [description]
      * @param string $column
      *
      * @return void
      */
-    public function addSearch(string $query, int $type = Search::TYPE_EQUALS, string $column = null)
-    {
+    public function addSearch(
+        string $query,
+        int $operator,
+        int $caseSensitivity,
+        string $column = null
+    ) {
         // todo, validate column
 
-        $search = new Search($query, $type);
+        $search = new Search($query, $operator, $caseSensitivity);
 
         if (null === $column) {
             $this->globalSearch = $search;

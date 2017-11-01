@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Hekkema\QueryBrowser;
 
-use Hekkema\QueryBrowser\Exception\InvalidIdentifierException;
+use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
 use Hekkema\QueryBrowser\Driver\Query\QueryDriverInterface;
 use Hekkema\QueryBrowser\Driver\Request\RequestDriverInterface;
 use Hekkema\QueryBrowser\Driver\Storage\StorageDriverInterface;
@@ -39,7 +39,7 @@ class QueryBrowser implements \Serializable
     /**
      * Configuration
      *
-     * @var array
+     * @var ConfigManager
      */
     protected $config;
 
@@ -78,7 +78,7 @@ class QueryBrowser implements \Serializable
      *
      * @var int
      */
-    protected $pageSize = 25;
+    protected $pageSize;
 
     /**
      * @TODO
@@ -101,51 +101,30 @@ class QueryBrowser implements \Serializable
      * @param QueryDriverInterface $queryDriver
      *
      * @return void
-     *
-     * @throws InvalidIdentifierException When id is empty or invalid
      */
     public function __construct(
         QueryDriverInterface $queryDriver,
-        RequestDriverInterface $requestDriver,
-        StorageDriverInterface $storageDriver,
         array $config = []
     ) {
+        $this->config = new ConfigManager($config);
+
         // if no id is supplied, use the one from the driver
-        if ('' === $id) {
+        try {
+            $id = $this->config->get('qb.id');
+        } catch (InvalidArgumentException $e) {
             $id = $queryDriver->generateId();
         }
 
-        if ('' === $id) {
-            throw new InvalidIdentifierException('Identifier can not be empty.');
-        }
+        $requestDriver = $this->config->get('qb.requestDriver');
+        $storageDriver = $this->config->get('qb.storageDriver');
 
-        if (0 === preg_match('/[a-zA-Z0-9]+/', $id)) {
-            throw new InvalidIdentifierException(
-                sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
-            );
-        }
-
-        $this->config = $config;
-
-        // always prefix the id
-        $this->id = self::QB_PREFIX.$id;
-
-        $this->queryDriver = $queryDriver;
-        $this->requestDriver = $requestDriver;
-        $this->storageDriver = $storageDriver;
-
+        $this->setId($id);
+        $this->setQueryDriver($queryDriver);
+        $this->setRequestDriver(new $requestDriver);
+        $this->setStorageDriver(new $storageDriver);
         $this->orderBy = new OrderBy();
         $this->searchManager = new SearchManager();
-    }
-
-    /**
-     * Get the driver
-     *
-     * @return QueryDriverInterface
-     */
-    public function getQueryDriver()
-    {
-        return $this->queryDriver;
+        $this->setPageSize($this->config->get('qb.pageSize'));
     }
 
     /**
@@ -156,6 +135,115 @@ class QueryBrowser implements \Serializable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set the id
+     *
+     * @param string $id
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException When id is empty or invalid
+     */
+    public function setId(string $id)
+    {
+        if ('' === $id) {
+            throw new InvalidArgumentException('Identifier can not be empty.');
+        }
+
+        if (0 === preg_match('/[a-zA-Z0-9]+/', $id)) {
+            throw new InvalidArgumentException(
+                sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
+            );
+        }
+
+        // always prefix the id
+        $this->id = self::QB_PREFIX.$id;
+
+        return $this;
+    }
+
+    /**
+     * Get the config
+     *
+     * @return ConfigManager
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Get the query driver
+     *
+     * @return QueryDriverInterface
+     */
+    public function getQueryDriver()
+    {
+        return $this->queryDriver;
+    }
+
+    /**
+     * Set the query driver
+     *
+     * @param QueryDriverInterface $queryDriver
+     *
+     * @return self
+     */
+    public function setQueryDriver(QueryDriverInterface $queryDriver)
+    {
+        $this->queryDriver = $queryDriver;
+
+        return $this;
+    }
+
+    /**
+     * Get the request driver
+     *
+     * @return RequestDriverInterface
+     */
+    public function getRequestDriver()
+    {
+        return $this->requestDriver;
+    }
+
+    /**
+     * Set the request driver
+     *
+     * @param RequestDriverInterface $requestDriver
+     *
+     * @return self
+     */
+    public function setRequestDriver(RequestDriverInterface $requestDriver)
+    {
+        $this->requestDriver = $requestDriver;
+
+        return $this;
+    }
+
+    /**
+     * Get the storage driver
+     *
+     * @return StorageDriverInterface
+     */
+    public function getStorageDriver()
+    {
+        return $this->storageDriver;
+    }
+
+    /**
+     * Set the storage driver
+     *
+     * @param StorageDriverInterface $storageDriver
+     *
+     * @return self
+     */
+    public function setStorageDriver(StorageDriverInterface $storageDriver)
+    {
+        $this->storageDriver = $storageDriver;
+
+        return $this;
     }
 
     /**
@@ -175,12 +263,12 @@ class QueryBrowser implements \Serializable
      *
      * @return self
      *
-     * @throws InvalidIdentifierException When $page is lower than 1
+     * @throws InvalidArgumentException When $page is lower than 1
      */
     public function setPage(int $page)
     {
         if ($page < 1) {
-            throw new InvalidIdentifierException;
+            throw new InvalidArgumentException('$page must be 0 or higher.');
         }
 
         $this->page = $page;
@@ -207,12 +295,12 @@ class QueryBrowser implements \Serializable
      *
      * @return self
      *
-     * @throws InvalidIdentifierException When $pageSize is lower than 0
+     * @throws InvalidArgumentException When $pageSize is lower than 0
      */
     public function setPageSize(int $pageSize)
     {
         if ($pageSize < 0) {
-            throw new InvalidIdentifierException;
+            throw new InvalidArgumentException('$pageSize must be 0 or higher.');
         }
 
         $this->pageSize = $pageSize;
@@ -333,7 +421,7 @@ class QueryBrowser implements \Serializable
      *
      * @return void
      */
-    public function loadStateFromArray(array $data)
+    protected function loadStateFromArray(array $data)
     {
         if (isset($data['id']) && $data['id'] === $this->id) {
             if (isset($data['page'])) {
@@ -345,7 +433,13 @@ class QueryBrowser implements \Serializable
             }
 
             if (isset($data['search'])) {
-                //$this->setGlobalSearch($data['globalSearch']);
+                if (isset($data['search']['global']) && '' !== $data['search']['global']) {
+                    $this->searchManager->addSearch(
+                        $data['search']['global'],
+                        $this->config->get('qb.search.operator'),
+                        $this->config->get('qb.search.caseSensitivity')
+                    );
+                }
             }
 
             if (isset($data['orderBy'])) {

@@ -46,5 +46,5 @@ interface RequestDriverInterface
      *
      * @return bool
      */
-    public function set(string $key, $value);
+    public function set(string $key, $value): bool;
 }

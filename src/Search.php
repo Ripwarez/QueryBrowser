@@ -24,17 +24,23 @@ use Hekkema\QueryBrowser\Exception\InvalidArgumentException;
 class Search
 {
     /**
-     * Search types
+     * Search comparison operators
      */
-    const TYPE_EQUALS = 0;
-    const TYPE_NOT_EQUALS = 1;
-    const TYPE_GREATER_THAN = 2;
-    const TYPE_GREATER_THAN_OR_EQUAL = 3;
-    const TYPE_LESS_THAN = 4;
-    const TYPE_LESS_THAN_OR_EQUAL = 5;
-    const TYPE_STARTS_WITH = 6;
-    const TYPE_ENDS_WITH = 7;
-    const TYPE_SUBSTRING = 8;
+    const OPERATOR_EQUALS = 0;
+    const OPERATOR_NOT_EQUALS = 1;
+    const OPERATOR_GREATER_THAN = 2;
+    const OPERATOR_GREATER_THAN_OR_EQUAL = 3;
+    const OPERATOR_LESS_THAN = 4;
+    const OPERATOR_LESS_THAN_OR_EQUAL = 5;
+    const OPERATOR_STARTS_WITH = 6;
+    const OPERATOR_ENDS_WITH = 7;
+    const OPERATOR_SUBSTRING = 8;
+
+    /**
+     * Search sensitivity
+     */
+    const CASE_INSENSITIVE = 0;
+    const CASE_SENSITIVE = 1;
 
     /**
      *
@@ -48,20 +54,28 @@ class Search
      *
      * @var int
      */
-    protected $type;
+    protected $operator;
+
+    /**
+     *
+     *
+     * @var int
+     */
+    protected $caseSensitivity;
 
     /**
      *
      *
      * @param string $query [description]
-     * @param int    $type  [description]
+     * @param int    $operator  [description]
      *
      * @return void
      */
-    public function __construct(string $query, int $type)
+    public function __construct(string $query, int $operator, int $caseSensitivity)
     {
         $this->setQuery($query);
-        $this->setType($type);
+        $this->setOperator($operator);
+        $this->setSensitivity($caseSensitivity);
     }
 
     /**
@@ -95,31 +109,72 @@ class Search
     }
 
     /**
-     * Get type
+     * Get operator
      *
      * @return int
      */
-    public function getType()
+    public function getOperator()
     {
-        return $this->type;
+        return $this->operator;
     }
 
     /**
-     * Set type
+     * Set operator
      *
-     * @param int $type
+     * @param int $operator
      *
      * @return self
      *
      * @throws InvalidArgumentException
      */
-    public function setType(int $type)
+    public function setOperator(int $operator)
     {
-        if ($type < 0 || $type > 8) {
-            throw new InvalidArgumentException('Invalid type.');
+        if ($operator < 0 || $operator > 8) {
+            throw new InvalidArgumentException('Invalid operator.');
         }
 
-        $this->type = $type;
+        $this->operator = $operator;
+
+        return $this;
+    }
+
+    /**
+     * Get case sensitivity
+     *
+     * @return int
+     */
+    public function getCaseSensitivity()
+    {
+        return $this->caseSensitivity;
+    }
+
+    /**
+     * Is case sensitive
+     *
+     * @return bool
+     */
+    public function isCaseSensitive()
+    {
+        return $this->caseSensitivity === self::CASE_SENSITIVE;
+    }
+
+
+    /**
+     * Set case sensitivity
+     *
+     * @param int $caseSensitivity
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setSensitivity(int $caseSensitivity)
+    {
+        if ($caseSensitivity < 0 || $caseSensitivity > 1) {
+            throw new InvalidArgumentException('Invalid sensitivity.');
+        }
+
+        $this->caseSensitivity = $caseSensitivity;
 
         return $this;
     }
@@ -132,8 +187,9 @@ class Search
     public function toArray()
     {
         return [
-            'query' => $this->query,
-            'type'  => $this->type,
+            'query'           => $this->query,
+            'operator'        => $this->operator,
+            'caseSensitivity' => $this->caseSensitivity,
         ];
     }
 }

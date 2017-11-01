@@ -13,33 +13,13 @@
 
 declare(strict_types=1);
 
-namespace Hekkema\QueryBrowser\Result;
+namespace Hekkema\QueryBrowser\Driver\View;
 
 /**
  * class View
  */
-class View
+class DefaultViewDriver implements ViewDriverInterface
 {
-    use ViewTrait;
-
-    protected $file;
-
-    protected $data;
-
-    /**
-     * Construct a new QueryBrowser\View
-     *
-     * @param string $file
-     * @param array  $data
-     *
-     * @return void
-     */
-    public function __construct(string $file, array $data)
-    {
-        $this->file = $file;
-        $this->data = $data;
-    }
-
     /**
      * Render the view
      *
@@ -47,13 +27,13 @@ class View
      *
      * @return void
      */
-    public function render()
+    public function render(string $file, array $data): string
     {
         // create the variables
-        extract($this->data);
+        extract($data);
 
         ob_start();
-        include($this->file);
+        include($file);
         $html = ob_get_contents();
         ob_end_clean();
 

@@ -96,8 +96,7 @@ class Column
     {
         $this->id = $id;
         $this->name = $id;
-
-        $this->sequence = $sequence * 100;
+        $this->sequence = $sequence;
     }
 
     /**
@@ -141,7 +140,7 @@ class Column
      */
     public function getSequence()
     {
-        return $this->name;
+        return $this->sequence;
     }
 
     /**

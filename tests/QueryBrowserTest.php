@@ -13,27 +13,27 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use Hekkema\QueryBrowser\QueryBrowser;
-use Hekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
-use Hekkema\QueryBrowser\Driver\Request\RequestDriver;
-use Hekkema\QueryBrowser\Driver\Storage\NullStorageDriver;
-
+use Hekkema\QueryBrowser\Factory;
 /**
  * @covers QueryBrowser
  */
 class QueryBrowserTest extends TestCase
 {
+    private $qb;
+
+    public function setUp()
+    {
+        $this->qb = Factory::create([]);
+    }
+
     /**
-     * @expectedException Hekkema\QueryBrowser\Exception\InvalidIdentifierException
+     * @expectedException Hekkema\QueryBrowser\Exception\InvalidArgumentException
      *
      * @dataProvider idProvider
      */
-    public function testInvalidIdentifierException($id)
+    public function testSetIdException($id)
     {
-        $arrayDriver = $this->createMock(ArrayQueryDriver::class);
-        $requestDriver = $this->createMock(RequestDriver::class);
-        $storageDriver = $this->createMock(NullStorageDriver::class);
-
-        new QueryBrowser($arrayDriver, $requestDriver, $storageDriver, $id);
+        $this->qb->setId($id);
     }
 
     public function idProvider()

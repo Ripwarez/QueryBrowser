@@ -21,7 +21,7 @@ namespace Hekkema\QueryBrowser\Driver\Storage;
 class CookieStorageDriver implements StorageDriverInterface
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function get(string $key)
     {
@@ -33,9 +33,9 @@ class CookieStorageDriver implements StorageDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function set(string $key, string $value)
+    public function set(string $key, string $value): bool
     {
         return setcookie($key, $value);
     }

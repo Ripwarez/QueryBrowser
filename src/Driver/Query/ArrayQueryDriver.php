@@ -60,7 +60,7 @@ class ArrayQueryDriver implements QueryDriverInterface
     /**
      * {@inheritDoc}
      */
-    public function generateId()
+    public function generateId(): string
     {
         $keys = implode('-', array_keys($this->data));
 
@@ -68,17 +68,17 @@ class ArrayQueryDriver implements QueryDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function getOrderBy()
+    public function getOrderBy(): OrderBy
     {
         return new OrderBy();
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit)
+    public function getResults(OrderBy $orderBy, SearchManager $searchManager, int $offset, int $limit): array
     {
         // search
         if (!$searchManager->isEmpty()) {
@@ -100,9 +100,9 @@ class ArrayQueryDriver implements QueryDriverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager)
+    public function getTotalResults(OrderBy $orderBy, SearchManager $searchManager): int
     {
         return count($this->data);
     }
@@ -114,15 +114,74 @@ class ArrayQueryDriver implements QueryDriverInterface
      */
     protected function applyGlobalSearch(Search $search)
     {
+        $searchQuery = $search->getQuery();
+        $searchOperator = $search->getOperator();
+        $searchCaseSensitive = $search->IsCaseSensitive();
+
+        if (false === $searchCaseSensitive) {
+            $searchQuery = mb_strtolower($searchQuery);
+        }
+
         foreach ($this->data as $k => $row) {
             $found = false;
-            foreach ($row as $field) {
-                if (is_array($field) || is_object($field)) {
-                    $field = print_r($field, true);
+            foreach ($row as $value) {
+                if (is_array($value) || is_object($value)) {
+                    $value = print_r($value, true);
                 }
 
-                if (false !== stripos($field, $search->getQuery())) {
-                    $found = true;
+                if (false === $searchCaseSensitive) {
+                    $value = mb_strtolower($value);
+                }
+
+                switch ($searchOperator) {
+                    case Search::OPERATOR_EQUALS:
+                        $found = ($searchQuery === $value);
+                        break;
+
+                    case Search::OPERATOR_NOT_EQUALS:
+                        $found = ($searchQuery !== $value);
+                        break;
+
+                    /**
+                     * these operators only apply to columns!
+                     *
+                    case Search::OPERATOR_GREATER_THAN:
+                        $found = ($searchQuery > $value);
+                        break;
+
+                    case Search::OPERATOR_GREATER_THAN_OR_EQUAL:
+                        $found = ($searchQuery >= $value);
+                        break;
+
+                    case Search::OPERATOR_LESS_THAN:
+                        $found = ($searchQuery < $value);
+                        break;
+
+                    case Search::OPERATOR_LESS_THAN_OR_EQUAL:
+                        $found = ($searchQuery <= $value);
+                        break;
+                    */
+
+                    case Search::OPERATOR_STARTS_WITH:
+                        $found = (0 === strpos($value, $searchQuery));
+                        break;
+
+                    case Search::OPERATOR_ENDS_WITH:
+                        $value = mb_substr($value, mb_strlen($searchQuery) * -1);
+                        $found = ($searchQuery === $value);
+                        break;
+
+                    case Search::OPERATOR_SUBSTRING:
+                        $found = (false !== strpos($value, $searchQuery));
+                        break;
+
+                    default:
+                        throw new \Exception(sprintf('Unknown operator: %d', $searchOperator));
+                        break;
+                }
+
+                // stop searching if found
+                if (true === $found) {
                     break;
                 }
             }
