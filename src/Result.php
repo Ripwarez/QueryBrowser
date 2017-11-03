@@ -190,22 +190,19 @@ class Result
             $this->setTemplate($template);
         }
 
-        $data = array_merge(
-            [
-                'createURI' => '',
-                'updateURI' => '',
-                'sortURI'   => '',
-                'deleteURI' => '',
-            ],
-            $data
-        );
+        $data = array_merge($this->qb->getConfig()->get('qbr.defaultData'), $data);
 
         $totalPages = ceil($this->totalResults / $this->qb->getPageSize());
         $nrResults = count($this->results);
         $page = $this->qb->getPage();
         $offset = $this->qb->getOffset();
         $orderBy = $this->qb->getOrderBy();
+
+        $globalSearch = '';
         $searchManager = $this->qb->getSearchManager();
+        if (false === $searchManager->isEmpty()) {
+        	$searchManager->getGlobalSearch()->getQuery();
+        }
 
         $this->sortColumns();
 
@@ -215,7 +212,7 @@ class Result
             'columns'         => $this->columns,
             'orderBy'         => $orderBy->getField(),
             'orderDirection'  => $orderBy->getDirection(),
-            'globalSearch'    => $searchManager->getGlobalSearch()->getQuery(),
+            'globalSearch'    => $globalSearch,
             'firstResult'     => $offset + 1,
             'lastResult'      => $offset + $nrResults,
             'nrResults'       => $nrResults,
@@ -227,7 +224,6 @@ class Result
             'firstPage'       => ($page != 1) ? 1 : 0,
             'lastPage'        => ($page < $totalPages) ? $totalPages : 0,
             'pageSize'        => $this->qb->getPageSize(),
-            'pageSizeOptions' => $this->qb->getConfig()->get('qbr.pageSizeOptions'),
             'createURI'       => $data['createURI'],
             'updateURI'       => $data['updateURI'],
             'deleteURI'       => $data['deleteURI']

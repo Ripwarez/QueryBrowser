@@ -95,6 +95,8 @@ class OrderBy
      */
     public function setDirection(string $direction)
     {
+        $direction = strtolower($direction);
+
         if (false === in_array($direction, ['', 'asc', 'desc'])) {
             throw new InvalidArgumentException("The value must be '', 'asc' or 'desc'.");
         }

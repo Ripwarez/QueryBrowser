@@ -104,24 +104,22 @@ class QueryBrowser implements \Serializable
      */
     public function __construct(
         QueryDriverInterface $queryDriver,
-        array $config = []
+        RequestDriverInterface $requestDriver,
+        StorageDriverInterface $storageDriver,
+        ConfigManager $config
     ) {
-        $this->config = new ConfigManager($config);
-
         // if no id is supplied, use the one from the driver
         try {
-            $id = $this->config->get('qb.id');
+            $id = $config->get('qb.id');
         } catch (InvalidArgumentException $e) {
             $id = $queryDriver->generateId();
         }
 
-        $requestDriver = $this->config->get('qb.requestDriver');
-        $storageDriver = $this->config->get('qb.storageDriver');
-
         $this->setId($id);
         $this->setQueryDriver($queryDriver);
-        $this->setRequestDriver(new $requestDriver);
-        $this->setStorageDriver(new $storageDriver);
+        $this->setRequestDriver($requestDriver);
+        $this->setStorageDriver($storageDriver);
+        $this->config = $config;
         $this->orderBy = new OrderBy();
         $this->searchManager = new SearchManager();
         $this->setPageSize($this->config->get('qb.pageSize'));
@@ -154,7 +152,7 @@ class QueryBrowser implements \Serializable
 
         if (0 === preg_match('/[a-zA-Z0-9]+/', $id)) {
             throw new InvalidArgumentException(
-                sprintf('Identifier can only contain alfanumeric characters (%s).', $id)
+                sprintf('Identifier can only contain alphanumeric characters (%s).', $id)
             );
         }
 

@@ -39,8 +39,13 @@ class ConfigManager
         'qb.search.caseSensitivity' => Search::CASE_INSENSITIVE,
         'qbr.viewDriver'            => DefaultViewDriver::class,
         'qbr.template'              => '',
-        'qbr.defaultData'           => [],
-        'qbr.pageSizeOptions'       => [10, 25, 50, 100],
+        'qbr.defaultData'           => [
+        	'createURI'       => '',
+        	'updateURI'       => '',
+        	'sortURI'         => '',
+        	'deleteURI'       => '',
+        	'pageSizeOptions' => [10, 25, 50, 100],
+        ],
     ];
 
     /**

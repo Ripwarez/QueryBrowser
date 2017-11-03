@@ -17,6 +17,7 @@ namespace Hekkema\QueryBrowser;
 
 use Hekkema\QueryBrowser\Exception\DriverNotFoundException;
 use Hekkema\QueryBrowser\Driver\Query\ArrayQueryDriver;
+use Hekkema\QueryBrowser\Driver\Query\DoctrineORMQueryDriver;
 
 /**
  * Factory for creating a new QueryBrowser.
@@ -29,7 +30,8 @@ class Factory
      * @var array
      */
     private static $queryDriversList = [
-        'array' => ArrayQueryDriver::class,
+        'array'                     => ArrayQueryDriver::class,
+        'Doctrine\ORM\QueryBuilder' => DoctrineORMQueryDriver::class,
     ];
 
     /**
@@ -55,7 +57,7 @@ class Factory
                 break;
 
             case 'object':
-                $class = getclass($sourceObject);
+                $class = get_class($sourceObject);
                 if (isset(self::$queryDriversList[$class])) {
                     $queryDriverClass = self::$queryDriversList[$class];
                 }
@@ -63,12 +65,18 @@ class Factory
         }
 
         if ('' === $queryDriverClass) {
-            throw new DriverNotFoundException('Unable to determine QueryDriver.');
+            throw new DriverNotFoundException(sprintf('No QueryDriver available for %s.', get_class($sourceObject)));
         }
 
-        // create the querydriver
-        $queryDriver = new $queryDriverClass($sourceObject);
+        $config = new ConfigManager($config);
+        $requestDriverClass = $config->get('qb.requestDriver');
+        $storageDriverClass = $config->get('qb.storageDriver');
 
-        return new QueryBrowser($queryDriver, $config);
+        // create drivers
+        $queryDriver = new $queryDriverClass($sourceObject);
+        $requestDriver = new $requestDriverClass();
+        $storageDriver = new $storageDriverClass();
+
+        return new QueryBrowser($queryDriver, $requestDriver, $storageDriver, $config);
     }
 }
